@@ -1,10 +1,9 @@
 import Joi from "joi";
 import { phonePattern } from "../pattern/phonePattern";
-import { passwordPattern } from "../pattern/passwordPattern";
-import { IRegiserInputs } from "../../@types/global";
+import { IUpdateInputs } from "../../@types/global";
 import validation from "../validation";
 
-const registerSchema = Joi.object<IRegiserInputs>({
+const UpdateUserScehma = Joi.object<IUpdateInputs>({
   firstName: Joi.string().min(2).max(256).required().messages({
     "string.empty": "firstName cannot be empty",
     "any.required": "firstName is a required field",
@@ -32,25 +31,6 @@ const registerSchema = Joi.object<IRegiserInputs>({
       "any.required": "email is a required field",
       "string.email": "email is not valid",
     }),
-  password: Joi.string()
-    .pattern(passwordPattern)
-    .messages({
-      "string.pattern.base":
-        "password should be at least one special charcter and one upper case charcter",
-      "string.empty": "password should be at least 7 charcters",
-      "string.min": "Password must be at least 7 characters long",
-    })
-    .min(7)
-    .max(20)
-    .required(),
-  passwordConfirmation: Joi.string()
-    .valid(Joi.ref("password"))
-    .required()
-    .messages({
-      "any.only": "passwords does not match",
-      "string.empty": "passworConfirmation cannot be empty",
-    }),
-  alt: Joi.string().allow(""),
   url: Joi.string().required().messages({
     "string.empty": "url cannot be empty",
     "any.required": "url is a required field",
@@ -69,6 +49,6 @@ const registerSchema = Joi.object<IRegiserInputs>({
     "number.base": "Building number must be a number",
   }),
 });
-const validateRegister = (inputToCheck: IRegiserInputs) =>
-  validation(registerSchema, inputToCheck);
-export { validateRegister };
+const validateUpdateUser = (inputToCheck: IUpdateInputs) =>
+  validation(UpdateUserScehma, inputToCheck);
+export { validateUpdateUser };

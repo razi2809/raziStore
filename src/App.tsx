@@ -1,14 +1,12 @@
-import React from "react";
-import logo from "./logo.svg";
+import { Box } from "@mui/material";
 import "./App.css";
-import GoogleButton from "./googleButton";
 import Router from "./Router/routes";
 
 function App() {
   return (
-    <div className="App">
+    <Box className="App">
       <Router />
-    </div>
+    </Box>
   );
 }
 

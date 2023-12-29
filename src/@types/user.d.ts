@@ -1,18 +1,18 @@
 import { IAddress, IImage, IName } from "./global";
 
 interface Iuser {
-    email: string;
-    phoneNumber: string;
-    name: IName;
-    address: IAddress;
-    image:IImage
-    isAdmin: boolean;
-    isBusiness: boolean;
-    orders: string[];
-    theme: string;
-    _id: Types.ObjectId;
+  email: string;
+  phoneNumber: string;
+  name: IName;
+  address: IAddress;
+  image: IImage;
+  isAdmin: boolean;
+  isBusiness: boolean;
+  orders: string[];
+  theme: string;
+  _id: Types.ObjectId;
 }
-interface IuserValidate {
+/* interface IuserValidate {
     email: string;
     phoneNumber: string;
     firstName:string,
@@ -29,5 +29,5 @@ interface IuserValidate {
     theme: string;
     password:string,
     passworConfirmation:string
-}
-export{Iuser ,IuserValidate}
+} */
+export { Iuser };

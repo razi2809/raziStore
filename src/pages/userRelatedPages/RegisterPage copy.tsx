@@ -13,7 +13,7 @@ import {
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 
 import React, { Fragment, useState } from "react";
-import { ErrorObj, IRegiserInputs } from "../../@types/global";
+import { ErrorObj, ILocation, IRegiserInputs } from "../../@types/global";
 import { validateRegister } from "../../validation/validationSchema/registerSchema";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { storage } from "../../config/fireBase";
@@ -21,9 +21,10 @@ import { normalRegister } from "../../normalizedData/registerFormat";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import GoogleMap from "../../components/layoutRelatedComponents/GoogleMap";
+import { object } from "joi";
 const defaultAvatarUrl =
   "https://firebasestorage.googleapis.com/v0/b/social-media-27267.appspot.com/o/images%2FavatarDefaulPic.png?alt=media&token=1ca6c08e-505f-465b-bcd9-3d47c9b1c28f";
-const RegisterPage = () => {
+const RegisterPageCopy = () => {
   const navigate = useNavigate();
   const [inputs, setInputs] = useState<IRegiserInputs>({
     firstName: "",
@@ -46,6 +47,7 @@ const RegisterPage = () => {
   const [progress, setProgress] = useState(0);
   const [buffer, setBuffer] = useState(10);
   const [upload, setUpload] = useState(false);
+
   const handleSetPic = (e: React.ChangeEvent<HTMLInputElement>) => {
     const inputElement = e.target as HTMLInputElement;
     if (inputElement.files) {
@@ -72,7 +74,7 @@ const RegisterPage = () => {
       const joiResponse = validateRegister(updatedInputs);
       setErrorsState(joiResponse);
     }
-    if (e.target.id === "buildingNumber") {
+    if (e.target.id === "passwordConfirmation") {
       //check if its the lest input and want to regisert
       //sende the inpunts to the joi validate
       //if error from joi then set them and trigerr a alert for each input
@@ -82,7 +84,16 @@ const RegisterPage = () => {
       setSeconrychance(true);
     }
   };
-
+  const handleLocationChange = (location: ILocation) => {
+    let updatedInputs = { ...inputs };
+    Object.entries(location).map(([key, value]) => {
+      setInputs((currentState) => ({
+        //update the state  values
+        ...currentState,
+        [key]: value,
+      }));
+    });
+  };
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
@@ -138,7 +149,6 @@ const RegisterPage = () => {
       axios
         .post("/users/register", data)
         .then(function (res) {
-          console.log(res);
           //user created go to verifiey it
           navigate(`/verify/${inputs.email}`);
         })
@@ -208,33 +218,38 @@ const RegisterPage = () => {
             {Object.entries(inputs).map(([key, value]) => {
               const error = errorsState ? errorsState[key] || null : null;
               return (
-                <Fragment key={key}>
-                  <Grid
-                    container
-                    item
-                    spacing={2}
-                    xs={12}
-                    sm={5}
-                    md={5}
-                    sx={{ pb: "1em", m: "auto", mb: "0px" }}
-                  >
-                    {error && key !== "url" && (
-                      <Typography
-                        variant="body2"
-                        sx={{ mb: 0.5, color: "red" }}
-                      >
-                        *{error}
-                      </Typography>
-                    )}
-                    {key !== "url" && (
+                key !== "url" &&
+                key !== "city" &&
+                key !== "street" &&
+                key !== "buildingNumber" &&
+                key !== "alt" && (
+                  <Fragment key={key}>
+                    <Grid
+                      container
+                      item
+                      spacing={2}
+                      xs={12}
+                      sm={5}
+                      md={5}
+                      sx={{ pb: "1em", m: "auto", mb: "0px" }}
+                    >
+                      {error && key !== "url" && (
+                        <Typography
+                          variant="body2"
+                          sx={{ mb: 0.5, color: "red" }}
+                        >
+                          *{error}
+                        </Typography>
+                      )}
+
                       <TextField
                         fullWidth
                         autoFocus={key === "firstName" ? true : false}
                         id={key}
                         label={key.charAt(0).toUpperCase() + key.slice(1)}
                         placeholder={
-                          key == "passworConfirmation"
-                            ? "enter your password again"
+                          key === "passwordConfirmation"
+                            ? "confirm password"
                             : key === "alt"
                             ? "decrib the pic"
                             : `Enter your ${key}`
@@ -246,7 +261,7 @@ const RegisterPage = () => {
                             ? showPassword
                               ? "text"
                               : "password"
-                            : key === "passworConfirmation"
+                            : key === "passwordConfirmation"
                             ? showConfiremedPassword
                               ? "text"
                               : "password"
@@ -294,9 +309,9 @@ const RegisterPage = () => {
                             : {}
                         }
                       />
-                    )}
-                  </Grid>
-                </Fragment>
+                    </Grid>
+                  </Fragment>
+                )
               );
             })}{" "}
             <Grid
@@ -307,36 +322,67 @@ const RegisterPage = () => {
               sm={12}
               md={12}
               sx={{
+                marginTop: 2,
                 justifyContent: "center",
-                alignContent: "center",
                 mb: 2,
-                flexDirection: "column",
+                // flexDirection: "column",
               }}
             >
-              <label
-                htmlFor="file-input"
-                style={{ display: "flex", justifyContent: "center" }}
+              <Box sx={{ p: 1 }}>
+                <GoogleMap getLocation={handleLocationChange} theme={"light"} />
+              </Box>
+              <Box
+                sx={{
+                  p: 1,
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "space-between",
+                  alignContent: "center",
+                }}
               >
-                <Avatar
-                  sx={{ width: 70, height: 70, cursor: "pointer", m: 1 }}
-                  alt="user pic"
-                  src={img ? URL.createObjectURL(img) : defaultAvatarUrl}
-                />{" "}
-                <input
-                  id="file-input"
-                  style={{ display: "none" }}
-                  className="file-input"
-                  type="file"
-                  accept="image/*"
-                  onChange={(e) => handleSetPic(e)}
-                />
-              </label>{" "}
+                <Typography variant="h6">user profile pic:</Typography>
+                <label htmlFor="file-input">
+                  <Avatar
+                    sx={{
+                      width: 70,
+                      height: 70,
+                      cursor: "pointer",
+                      marginLeft: "auto",
+                      marginRight: "auto",
+                    }}
+                    alt="user pic"
+                    src={img ? URL.createObjectURL(img) : defaultAvatarUrl}
+                  />{" "}
+                  <input
+                    id="file-input"
+                    style={{ display: "none" }}
+                    className="file-input"
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => handleSetPic(e)}
+                  />
+                </label>{" "}
+                <Box sx={{ width: 200, height: "3em" }}>
+                  <TextField
+                    id="alt"
+                    // label={"alt".charAt(0).toUpperCase() + "alt".slice(1)}
+                    placeholder="decrib the pic"
+                    value={inputs.alt}
+                    onChange={(e) => handleInputsChange(e)}
+                    inputProps={{ style: { padding: 7 } }}
+                  />
+                </Box>
+              </Box>
+
               {(errorsState !== null
                 ? true
                 : secondtrychance
                 ? false
                 : true) && (
-                <Typography variant="body2" sx={{ color: "text.primary" }}>
+                <Typography
+                  variant="body2"
+                  sx={{ color: "text.primary", mt: 1 }}
+                >
                   * if you dont fill up the inputs you cant register
                 </Typography>
               )}
@@ -361,4 +407,4 @@ const RegisterPage = () => {
   );
 };
 
-export default RegisterPage;
+export default RegisterPageCopy;

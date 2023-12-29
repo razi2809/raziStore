@@ -1,13 +1,16 @@
 {
   "homepage": "https://razi2809.github.io/raziStore",
-
   "name": "store-fronend",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
     "@emotion/react": "^11.11.1",
     "@emotion/styled": "^11.11.0",
+    "@googlemaps/js-api-loader": "^1.16.2",
+    "@mui/icons-material": "^5.15.1",
     "@mui/material": "^5.15.1",
+    "@react-google-maps/api": "^2.19.2",
+    "@reduxjs/toolkit": "^2.0.1",
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
@@ -17,11 +20,16 @@
     "@types/react-dom": "^18.2.18",
     "@types/react-router-dom": "^5.3.3",
     "axios": "^1.6.2",
+    "firebase": "^10.7.1",
     "joi": "^17.11.0",
+    "jwt-decode": "^4.0.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-redux": "^9.0.4",
     "react-router-dom": "^6.21.1",
     "react-scripts": "5.0.1",
+    "react-select": "^5.8.0",
+    "redux": "^5.0.1",
     "typescript": "^4.9.5",
     "web-vitals": "^2.1.4",
     "zod": "^3.22.4"
@@ -53,6 +61,7 @@
     ]
   },
   "devDependencies": {
+    "@types/jsonwebtoken": "^9.0.5",
     "gh-pages": "^6.1.1"
   }
 }

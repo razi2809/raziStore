@@ -1,15 +1,12 @@
 import React, { FC, useEffect, useState } from "react";
-import LoaderComponent from "./LoaderComponent";
-import { PaletteMode, ThemeProvider, createTheme } from "@mui/material";
-import {
-  amber,
-  blue,
-  deepOrange,
-  grey,
-  lime,
-  purple,
-} from "@mui/material/colors";
+import { Box, PaletteMode, ThemeProvider, createTheme } from "@mui/material";
+import { amber, blue, deepOrange, grey } from "@mui/material/colors";
 import MainComponent from "./MainComponent";
+import useAutoLogin from "../../hooks/useAutoLogin";
+import { useAppSelector } from "../../REDUX/bigPie";
+import { Iuser } from "../../@types/user";
+import LoaderComponent from "./LoaderComponent";
+import Header from "../headerRelatedComponent/Header";
 type Props = {
   children: React.ReactNode;
 };
@@ -22,15 +19,6 @@ const getDesignTokens = (mode: PaletteMode) => ({
           primary: {
             main: blue[400],
           },
-          userChat: {
-            active: "#dce1f9",
-            noActive: "white",
-            hover: "#434343",
-          },
-          message: {
-            iDidntSend: "#e8e8e8",
-            iSendIt: "#cfd6f7",
-          },
 
           divider: amber[200],
           text: {
@@ -40,25 +28,16 @@ const getDesignTokens = (mode: PaletteMode) => ({
         }
       : {
           primary: {
-            main: blue[900],
+            main: blue[700],
           },
           divider: "#212123",
-          userChat: {
-            active: "#20284d",
-            noActive: grey[200],
-            hover: "#434343",
-          },
-          message: {
-            iDidntSend: "#434343",
 
-            iSendIt: "#20284d",
-          },
           background: {
             default: deepOrange[900],
             paper: deepOrange[900],
           },
           text: {
-            primary: "#nnnnnn",
+            primary: "#ffffff",
             secondary: grey[500],
             hover: "white",
           },
@@ -69,16 +48,59 @@ const darkModeTheme = createTheme(getDesignTokens("dark"));
 const lightModeTheme = createTheme(getDesignTokens("light"));
 
 const LayoutComponents: FC<Props> = ({ children }) => {
-  return (
-    <ThemeProvider
-      theme={lightModeTheme}
-      // theme={theme.theme == "light" ? lightModeTheme : darkModeTheme}
-    >
-      {/* <Header done={isDone} /> */}
-      <MainComponent>{children}</MainComponent>
-    </ThemeProvider>
-  );
-  //   } else return <LoaderComponent />;
+  const user = useAppSelector((bigPie) => bigPie.authReducer);
+  // const [user, setUser] = useState<Iuser | null>(null);
+  const [done, setDone] = useState(false);
+  const login = useAutoLogin();
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const userdata = await login();
+        if (userdata != null) {
+          if (!userdata.authorized) {
+            // ErrorMessage(userdata.err);
+            console.log(userdata);
+          } else {
+            // setUserData(userdata);
+            // if ("user" in userdata) setUser(userdata.user);
+          }
+        }
+        //when user data is null means there are no token find in login function so dont show the user nothing
+        //when user data is unauthorized toast the error(server error)
+        //when user data is neither that means that login was success so dont show the user nothing
+      } catch (err) {
+        console.log(err);
+
+        // ErrorMessage(err);
+        // code to run when the useEffect failed
+        //send a tost with the error message
+      } finally {
+        setDone(true);
+        //set done to true which means that he done checking regardless of the result
+      }
+    })();
+  }, []);
+  if (done) {
+    return (
+      <ThemeProvider
+        theme={
+          user
+            ? user.user?.theme
+              ? user.user.theme === "light"
+                ? lightModeTheme
+                : darkModeTheme
+              : lightModeTheme
+            : lightModeTheme
+        }
+      >
+        <Header />
+        <Box sx={{ bgcolor: "divider" }}>
+          <MainComponent>{children}</MainComponent>
+        </Box>
+      </ThemeProvider>
+    );
+  } else return <LoaderComponent />;
 };
 
 export default LayoutComponents;
