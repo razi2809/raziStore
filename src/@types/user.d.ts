@@ -9,7 +9,7 @@ interface Iuser {
   isAdmin: boolean;
   isBusiness: boolean;
   orders: string[];
-  theme: string;
+  theme: "dark" | "light";
   _id: Types.ObjectId;
 }
 /* interface IuserValidate {

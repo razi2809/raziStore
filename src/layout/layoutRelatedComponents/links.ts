@@ -7,8 +7,11 @@ export const links = {
     //   { to: `${ROUTER.CARDS}/favorite`, children: "favorite" },
   ],
   loggedoutLinks: [
+    { to: ROUTER.HOME, children: "Home page" },
+
     { to: ROUTER.REGISTER, children: "Register page" },
     { to: ROUTER.LOGIN, children: "Login page" },
+    { to: ROUTER.PASSWORDRESET, children: "reset password" },
   ],
   businessType: [
     //   {

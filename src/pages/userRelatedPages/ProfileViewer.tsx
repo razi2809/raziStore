@@ -2,12 +2,19 @@ import { Avatar, Box, Grid, TextField, Typography } from "@mui/material";
 import React, { useState } from "react";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import { useAppSelector } from "../../REDUX/bigPie";
-import { ErrorObj, IRegiserInputs, IUpdateInputs } from "../../@types/global";
+import {
+  ErrorObj,
+  ILocation,
+  IRegiserInputs,
+  IUpdateInputs,
+} from "../../@types/global";
 import { validateUpdateUser } from "../../validation/validationSchema/updateUserSchema";
+import GoogleMapToEdit from "../../layout/layoutRelatedComponents/GoogleMapEdit";
+import GoogleMapToView from "../../layout/layoutRelatedComponents/GoogleMapToView";
 
 const ProfileViewer = () => {
   const user = useAppSelector((bigPie) => bigPie.authReducer);
-  const [edit, setEdit] = useState(true);
+  const [edit, setEdit] = useState(false);
   const [secondtrychance, setSeconrychance] = useState(false);
   const [errorsState, setErrorsState] = useState<ErrorObj | null>(null);
 
@@ -48,8 +55,18 @@ const ProfileViewer = () => {
       setSeconrychance(true);
     }
   };
+  const handleLocationChange = (location: ILocation) => {
+    let updatedInputs = { ...inputs };
+    Object.entries(location).map(([key, value]) => {
+      setInputs((currentState) => ({
+        //update the state  values
+        ...currentState,
+        [key]: value,
+      }));
+    });
+  };
   return (
-    <Grid container sx={{ mt: 0 }}>
+    <Grid container sx={{ mt: 4, mb: 4 }}>
       <Grid container item md={3} sm={2} xs={1}></Grid>
       <Grid
         container
@@ -133,7 +150,7 @@ const ProfileViewer = () => {
                 {edit && (
                   <TextField
                     sx={{ height: "100%" }}
-                    inputProps={{ style: { padding: 10 } }}
+                    inputProps={{ style: { padding: 10, width: "5em" } }}
                     id="firstName"
                     value={inputs.firstName}
                     onChange={(e) => handleInputsChange(e)}
@@ -159,7 +176,7 @@ const ProfileViewer = () => {
                 {edit && (
                   <TextField
                     sx={{ height: "100%" }}
-                    inputProps={{ style: { padding: 10 } }}
+                    inputProps={{ style: { padding: 10, width: "5em" } }}
                     id="lastName"
                     value={inputs.lastName}
                     onChange={(e) => handleInputsChange(e)}
@@ -177,8 +194,88 @@ const ProfileViewer = () => {
             >
               Address:
             </Typography>
+            <Box sx={{ marginLeft: "10em", height: "10em", width: 200 }}>
+              {edit && (
+                <GoogleMapToEdit
+                  theme={user.user?.theme!}
+                  getLocation={handleLocationChange}
+                />
+              )}
+              {!edit && (
+                <GoogleMapToView
+                  theme={user.user?.theme!}
+                  address={user.user?.address!}
+                />
+              )}
+            </Box>
+          </Box>
+          <Box sx={{ display: "flex", mb: 3, height: "3em" }}>
+            <Typography
+              variant="h6"
+              color={"text.primary"}
+              sx={{ width: "3em" }}
+            >
+              Email:
+            </Typography>
+
             <Box sx={{ marginLeft: "10em" }}>
-              <Box
+              <Box sx={{ display: "flex", justifyContent: "flex-start" }}>
+                {" "}
+                {!edit && (
+                  <Typography variant="h6" color={"text.secondary"}>
+                    {user.user?.email}
+                  </Typography>
+                )}
+                {edit && (
+                  <TextField
+                    sx={{ height: "100%" }}
+                    inputProps={{ style: { padding: 10 } }}
+                    id="email"
+                    value={inputs.email}
+                    onChange={(e) => handleInputsChange(e)}
+                  />
+                )}
+              </Box>
+            </Box>
+          </Box>
+          <Box sx={{ display: "flex", mb: 3, height: "3em" }}>
+            <Typography
+              variant="h6"
+              color={"text.primary"}
+              sx={{ width: "3em" }}
+            >
+              Phone:
+            </Typography>
+            <Box sx={{ marginLeft: "10em" }}>
+              <Box sx={{ display: "flex", justifyContent: "flex-start" }}>
+                {" "}
+                {!edit && (
+                  <Typography variant="h6" color={"text.secondary"}>
+                    {user.user?.phoneNumber}
+                  </Typography>
+                )}
+                {edit && (
+                  <TextField
+                    sx={{ height: "100%" }}
+                    inputProps={{ style: { padding: 10 } }}
+                    id="phoneNumber"
+                    value={inputs.phoneNumber}
+                    onChange={(e) => handleInputsChange(e)}
+                  />
+                )}
+              </Box>
+            </Box>
+          </Box>
+        </Box>
+      </Grid>
+      <Grid container item md={3} sm={2} xs={1}></Grid>
+    </Grid>
+  );
+};
+
+export default ProfileViewer;
+{
+  /* <Box
                 sx={{
                   display: "flex",
                   justifyContent: "flex-start",
@@ -285,71 +382,5 @@ const ProfileViewer = () => {
                     onChange={(e) => handleInputsChange(e)}
                   />
                 )}
-              </Box>
-            </Box>
-          </Box>
-          <Box sx={{ display: "flex", mb: 3, height: "3em" }}>
-            <Typography
-              variant="h6"
-              color={"text.primary"}
-              sx={{ width: "3em" }}
-            >
-              Email:
-            </Typography>
-
-            <Box sx={{ marginLeft: "10em" }}>
-              <Box sx={{ display: "flex", justifyContent: "flex-start" }}>
-                {" "}
-                {!edit && (
-                  <Typography variant="h6" color={"text.secondary"}>
-                    {user.user?.email}
-                  </Typography>
-                )}
-                {edit && (
-                  <TextField
-                    sx={{ height: "100%" }}
-                    inputProps={{ style: { padding: 10 } }}
-                    id="email"
-                    value={inputs.email}
-                    onChange={(e) => handleInputsChange(e)}
-                  />
-                )}
-              </Box>
-            </Box>
-          </Box>
-          <Box sx={{ display: "flex", mb: 3, height: "3em" }}>
-            <Typography
-              variant="h6"
-              color={"text.primary"}
-              sx={{ width: "3em" }}
-            >
-              Phone:
-            </Typography>
-            <Box sx={{ marginLeft: "10em" }}>
-              <Box sx={{ display: "flex", justifyContent: "flex-start" }}>
-                {" "}
-                {!edit && (
-                  <Typography variant="h6" color={"text.secondary"}>
-                    {user.user?.phoneNumber}
-                  </Typography>
-                )}
-                {edit && (
-                  <TextField
-                    sx={{ height: "100%" }}
-                    inputProps={{ style: { padding: 10 } }}
-                    id="phoneNumber"
-                    value={inputs.phoneNumber}
-                    onChange={(e) => handleInputsChange(e)}
-                  />
-                )}
-              </Box>
-            </Box>
-          </Box>
-        </Box>
-      </Grid>
-      <Grid container item md={3} sm={2} xs={1}></Grid>
-    </Grid>
-  );
-};
-
-export default ProfileViewer;
+              </Box> */
+}

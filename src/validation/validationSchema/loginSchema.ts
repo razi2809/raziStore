@@ -10,6 +10,7 @@ const loginScema = Joi.object<ILoginInputs>({
     .messages({
       "string.empty": "email cannot be empty",
       "any.required": "email is a required field",
+      "string.email": "email is not valid",
     }),
   password: Joi.string()
     .pattern(passwordPattern)

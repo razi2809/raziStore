@@ -11,16 +11,17 @@ interface Props {
   getLocation: (location: ILocation) => void;
   theme: "dark" | "light";
 }
-const GoogleMap: FC<Props> = ({ getLocation, theme }) => {
+const loader = new Loader({
+  apiKey: GOOGLE_API_KEY,
+  version: "weekly",
+  libraries: ["places", "maps", "marker"],
+});
+
+const GoogleMapToEdit: FC<Props> = ({ getLocation, theme }) => {
   let buildingNumber = NaN;
   let street = "";
   let city = "";
 
-  const loader = new Loader({
-    apiKey: GOOGLE_API_KEY,
-    version: "weekly",
-    libraries: ["places", "maps", "marker"],
-  });
   const mapRef = useRef<HTMLDivElement>(null);
   const [inputValue, setInputValue] = useState("");
   const [options, setOptions] = useState<OptionType[]>([]);
@@ -37,7 +38,6 @@ const GoogleMap: FC<Props> = ({ getLocation, theme }) => {
             lat: position.coords.latitude,
             lng: position.coords.longitude,
           };
-
           const mapOption: google.maps.MapOptions = {
             center: clientLocation,
             zoom: 17,
@@ -98,7 +98,7 @@ const GoogleMap: FC<Props> = ({ getLocation, theme }) => {
       }
     };
     initMap();
-  }, []);
+  }, [theme]);
   useEffect(() => {
     let active = true;
 
@@ -218,4 +218,4 @@ const GoogleMap: FC<Props> = ({ getLocation, theme }) => {
   );
 };
 
-export default GoogleMap;
+export default GoogleMapToEdit;

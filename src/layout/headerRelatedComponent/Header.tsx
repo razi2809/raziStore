@@ -53,7 +53,10 @@ function Header() {
     navigate(ROUTER.HOME);
   };
   return (
-    <AppBar position="sticky" sx={{ mb: 0, border: "1px solid transparent" }}>
+    <AppBar
+      position="sticky"
+      sx={{ border: "1px solid transparent", borderRadius: 10, width: "80vw" }}
+    >
       <Container maxWidth="xl">
         <Toolbar disableGutters sx={{ justifyContent: "space-evenly" }}>
           <Box

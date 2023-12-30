@@ -4,6 +4,8 @@ import {
   Button,
   Checkbox,
   Grid,
+  IconButton,
+  InputAdornment,
   TextField,
   Typography,
 } from "@mui/material";
@@ -15,6 +17,10 @@ import { useNavigate } from "react-router-dom";
 import { validateLogin } from "../../validation/validationSchema/loginSchema";
 import { storeToken } from "../../services/tokenService";
 import useAutoLogin from "../../hooks/useAutoLogin";
+import { Link } from "react-router-dom";
+import { ROUTER } from "../../Router/ROUTER";
+import { text } from "stream/consumers";
+import { Visibility, VisibilityOff } from "@mui/icons-material";
 const LoginPage = () => {
   const [inputs, setInputs] = useState<ILoginInputs>({
     email: "",
@@ -23,6 +29,8 @@ const LoginPage = () => {
   const [errorsState, setErrorsState] = useState<ErrorObj | null>(null);
   const [rememberMe, setrememberMe] = useState(false);
   const [secondtrychance, setSeconrychance] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+
   const login = useAutoLogin();
 
   const handleInputsChange = (
@@ -78,7 +86,7 @@ const LoginPage = () => {
         component="form"
         noValidate
         onSubmit={(e) => handleSubmit(e)}
-        sx={{ m: 20 }}
+        sx={{ marginTop: 4, marginBottom: 14 }}
       >
         <Grid container sx={{ mt: 0 }}>
           <Grid container item md={3} sm={2} xs={1}></Grid>
@@ -138,7 +146,7 @@ const LoginPage = () => {
                     xs={12}
                     sm={5}
                     md={5}
-                    sx={{ m: "auto", mb: "0px" }}
+                    sx={{ m: "auto", mb: 1 }}
                   >
                     {error && key != "url" && (
                       <Typography
@@ -157,6 +165,34 @@ const LoginPage = () => {
                       placeholder={`Enter your ${key}`}
                       value={Number.isNaN(value) ? "" : value}
                       onChange={(e) => handleInputsChange(e)}
+                      type={
+                        key === "password"
+                          ? showPassword
+                            ? "text"
+                            : "password"
+                          : "text"
+                      }
+                      InputProps={
+                        key === "password"
+                          ? {
+                              endAdornment: (
+                                <InputAdornment position="end">
+                                  <IconButton
+                                    onClick={() =>
+                                      setShowPassword(!showPassword)
+                                    }
+                                  >
+                                    {showPassword ? (
+                                      <Visibility />
+                                    ) : (
+                                      <VisibilityOff />
+                                    )}
+                                  </IconButton>
+                                </InputAdornment>
+                              ),
+                            }
+                          : {}
+                      }
                     />
                   </Grid>
                 </Fragment>
@@ -188,7 +224,7 @@ const LoginPage = () => {
               sx={{
                 justifyContent: "center",
                 alignContent: "center",
-                mb: 2,
+                mb: 1,
                 flexDirection: "column",
               }}
             >
@@ -198,10 +234,18 @@ const LoginPage = () => {
                 ? false
                 : true) && (
                 <Typography variant="body2" sx={{ color: "text.primary" }}>
-                  * if you dont fill up the inputs you cant be verified
+                  * if you dont fill up the inputs you cant log in
                 </Typography>
               )}
             </Grid>
+            <Box sx={{ mb: 1 }}>
+              <Link
+                to={ROUTER.PASSWORDRESET}
+                style={{ textDecoration: "none" }}
+              >
+                forgot password?
+              </Link>
+            </Box>
             <Button
               type="submit"
               fullWidth

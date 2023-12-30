@@ -1,5 +1,11 @@
 import React, { FC, useEffect, useState } from "react";
-import { Box, PaletteMode, ThemeProvider, createTheme } from "@mui/material";
+import {
+  Box,
+  Grid,
+  PaletteMode,
+  ThemeProvider,
+  createTheme,
+} from "@mui/material";
 import { amber, blue, deepOrange, grey } from "@mui/material/colors";
 import MainComponent from "./MainComponent";
 import useAutoLogin from "../../hooks/useAutoLogin";
@@ -24,6 +30,7 @@ const getDesignTokens = (mode: PaletteMode) => ({
           text: {
             primary: grey[900],
             secondary: grey[800],
+            active: grey[400],
           },
         }
       : {
@@ -94,8 +101,16 @@ const LayoutComponents: FC<Props> = ({ children }) => {
             : lightModeTheme
         }
       >
-        <Header />
-        <Box sx={{ bgcolor: "divider" }}>
+        <Box sx={{ bgcolor: "primary.main" }}>
+          <Box
+            sx={{
+              pt: 1,
+              display: "flex",
+              justifyContent: "center",
+            }}
+          >
+            <Header />
+          </Box>
           <MainComponent>{children}</MainComponent>
         </Box>
       </ThemeProvider>

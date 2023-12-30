@@ -1,6 +1,6 @@
 interface IImage {
   url: string;
-  alt: string;
+  alt?: string;
 }
 interface IName {
   firstName: string;
@@ -56,6 +56,12 @@ interface ILocation {
   street: string;
   city: string;
 }
+interface IResetPasswordInputs {
+  email: string;
+  passwordResetCode: string;
+  password: string;
+  passwordConfirmation: string;
+}
 export {
   IAddress,
   IImage,
@@ -67,4 +73,5 @@ export {
   ITokenPayload,
   IUpdateInputs,
   ILocation,
+  IResetPasswordInputs,
 };

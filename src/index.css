@@ -11,3 +11,13 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+.resetCode-enter {
+  transform: scale(0);
+  opacity: 0;
+}
+
+.resetCode-enter-active {
+  transform: scale(1);
+  opacity: 1;
+  transition: transform 0.5s ease-in-out , opacity 0.5s ease-in-out ;
+}
