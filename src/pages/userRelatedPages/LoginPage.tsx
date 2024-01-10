@@ -11,16 +11,14 @@ import {
 } from "@mui/material";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import React, { Fragment, useState } from "react";
-import { ErrorObj, ILoginInputs } from "../../@types/global";
-import axios from "axios";
-import { useNavigate } from "react-router-dom";
-import { validateLogin } from "../../validation/validationSchema/loginSchema";
+import { ErrorObj, ILoginInputs } from "../../@types/inputs";
+import { validateLogin } from "../../validation/validationSchema/userSchema/loginSchema";
 import { storeToken } from "../../services/tokenService";
 import useAutoLogin from "../../hooks/useAutoLogin";
 import { Link } from "react-router-dom";
 import { ROUTER } from "../../Router/ROUTER";
-import { text } from "stream/consumers";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
+import sendData from "../../hooks/useSendData";
 const LoginPage = () => {
   const [inputs, setInputs] = useState<ILoginInputs>({
     email: "",
@@ -62,19 +60,16 @@ const LoginPage = () => {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
-      axios
-        .post(`/auth/login`, inputs)
-        .then(function (res) {
-          login();
-          storeToken(res.data.token, secondtrychance);
-        })
-        .catch(function (e) {
-          console.log(e);
-          // the request failed(from server)
-        });
+      const res = await sendData({
+        url: `/auth/login`,
+        data: inputs,
+        method: "post",
+      });
+      storeToken(res.token, secondtrychance);
+      login();
     } catch (e) {
       //register have failed
       console.log(e);
@@ -148,7 +143,7 @@ const LoginPage = () => {
                     md={5}
                     sx={{ m: "auto", mb: 1 }}
                   >
-                    {error && key != "url" && (
+                    {error && (
                       <Typography
                         variant="body2"
                         sx={{ mb: 0.5, color: "red" }}
@@ -159,8 +154,10 @@ const LoginPage = () => {
 
                     <TextField
                       fullWidth
+                      name={key}
                       autoFocus={key === "email" ? true : false}
                       id={key}
+                      required
                       label={key.charAt(0).toUpperCase() + key.slice(1)}
                       placeholder={`Enter your ${key}`}
                       value={Number.isNaN(value) ? "" : value}
@@ -233,7 +230,7 @@ const LoginPage = () => {
                 : secondtrychance
                 ? false
                 : true) && (
-                <Typography variant="body2" sx={{ color: "text.primary" }}>
+                <Typography variant="body2" sx={{ color: "red" }}>
                   * if you dont fill up the inputs you cant log in
                 </Typography>
               )}

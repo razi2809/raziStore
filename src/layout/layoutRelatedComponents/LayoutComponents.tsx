@@ -1,12 +1,13 @@
 import React, { FC, useEffect, useState } from "react";
 import {
   Box,
-  Grid,
+  CssBaseline,
   PaletteMode,
+  ScopedCssBaseline,
   ThemeProvider,
   createTheme,
 } from "@mui/material";
-import { amber, blue, deepOrange, grey } from "@mui/material/colors";
+import { grey } from "@mui/material/colors";
 import MainComponent from "./MainComponent";
 import useAutoLogin from "../../hooks/useAutoLogin";
 import { useAppSelector } from "../../REDUX/bigPie";
@@ -23,26 +24,34 @@ const getDesignTokens = (mode: PaletteMode) => ({
     ...(mode === "light"
       ? {
           primary: {
-            main: blue[400],
+            main: "#ffffff", // white
           },
-
-          divider: amber[200],
+          secondary: {
+            main: "#add8e6", // light blue
+          },
+          background: {
+            default: grey[200],
+            paper: "#ffffff", // white
+          },
+          divider: grey[200],
           text: {
-            primary: grey[900],
+            primary: "#000000",
             secondary: grey[800],
             active: grey[400],
           },
         }
       : {
           primary: {
-            main: blue[700],
+            main: "#000000", // black
+          },
+          secondary: {
+            main: "#d8bfd8", // light purple
+          },
+          background: {
+            default: "#212123", // black
+            paper: "#000000", // black
           },
           divider: "#212123",
-
-          background: {
-            default: deepOrange[900],
-            paper: deepOrange[900],
-          },
           text: {
             primary: "#ffffff",
             secondary: grey[500],
@@ -101,18 +110,23 @@ const LayoutComponents: FC<Props> = ({ children }) => {
             : lightModeTheme
         }
       >
-        <Box sx={{ bgcolor: "primary.main" }}>
+        {" "}
+        <CssBaseline enableColorScheme />
+        <ScopedCssBaseline enableColorScheme>
           <Box
             sx={{
-              pt: 1,
-              display: "flex",
-              justifyContent: "center",
+              position: "relative",
+              bgcolor: "divider",
             }}
           >
-            <Header />
+            <Box sx={{ zIndex: 99, position: "absolute" }}>
+              <Header />
+            </Box>
+            <Box sx={{ mt: "7vh" }}>
+              <MainComponent>{children}</MainComponent>
+            </Box>
           </Box>
-          <MainComponent>{children}</MainComponent>
-        </Box>
+        </ScopedCssBaseline>
       </ThemeProvider>
     );
   } else return <LoaderComponent />;

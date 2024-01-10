@@ -5,10 +5,16 @@ import VerifyUserPage from "../pages/userRelatedPages/VerifyUserPage";
 import LoginPage from "../pages/userRelatedPages/LoginPage";
 import AuthPrevent from "../Guards/AuthPrevent";
 import AuthGuard from "../Guards/AuthGuard";
-import ProfileViewer from "../pages/userRelatedPages/ProfileViewer";
 import RegisterPage from "../pages/userRelatedPages/RegisterPage";
 import ResetPasswordPage from "../pages/userRelatedPages/ResetPasswordPage";
 import HomePage from "../pages/businessRelatedPages/HomePage";
+import BusinessPage from "../pages/businessRelatedPages/BusinessPage";
+import PlaceAnOrdePage from "../pages/ordersRelatedPages/PlaceAnOrdePage";
+import VerifyGuard from "../Guards/VerifyGuard";
+import OrderViewPage from "../pages/ordersRelatedPages/OrderViewPage";
+import ProfilePage from "../pages/userRelatedPages/ProfilePage";
+import CreateBusiness from "../pages/businessRelatedPages/CreateBusinessPage";
+import AddNewProduct from "../pages/businessRelatedPages/AddNewProduct";
 
 const Router = () => {
   return (
@@ -54,10 +60,41 @@ const Router = () => {
         element={
           <AuthGuard>
             {" "}
-            <ProfileViewer />{" "}
+            <ProfilePage />{" "}
           </AuthGuard>
         }
       />
+      <Route path={`${ROUTER.BUSINESS}`}>
+        <Route index element={<Directing />} />
+
+        <Route
+          path={`${ROUTER.BUSINESS}/:BusinessId`}
+          element={<BusinessPage />}
+        />
+        <Route
+          path={`${ROUTER.BUSINESS}/:BusinessId/addNewProduct`}
+          element={<AddNewProduct />}
+        />
+        <Route
+          path={`${ROUTER.BUSINESS}/newBusiness`}
+          element={<CreateBusiness />}
+        />
+      </Route>
+      <Route path={`${ROUTER.ORDER}`}>
+        <Route index element={<Directing />} />
+
+        <Route
+          path={`${ROUTER.ORDER}/neworder/:BusinessId`}
+          element={
+            <AuthGuard>
+              <VerifyGuard>
+                <PlaceAnOrdePage />
+              </VerifyGuard>
+            </AuthGuard>
+          }
+        />
+        <Route path={`${ROUTER.ORDER}/:orderId`} element={<OrderViewPage />} />
+      </Route>
     </Routes>
   );
 };

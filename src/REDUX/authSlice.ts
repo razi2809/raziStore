@@ -1,5 +1,5 @@
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
-import { Iuser } from "../@types/user";
+import { IAddress, Iuser } from "../@types/user";
 const authSlice = createSlice({
   initialState: {
     isLoggedIn: false,
@@ -16,6 +16,9 @@ const authSlice = createSlice({
       sessionStorage.removeItem("token");
       state.isLoggedIn = false;
       state.user = null;
+    },
+    addTemoprarlyAddress: (state, action: PayloadAction<IAddress>) => {
+      state.user?.address.push(action.payload);
     },
   },
 });

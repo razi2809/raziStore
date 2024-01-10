@@ -6,36 +6,38 @@ import IconButton from "@mui/material/IconButton";
 import Typography from "@mui/material/Typography";
 import Menu from "@mui/material/Menu";
 import MenuIcon from "@mui/icons-material/Menu";
-import Container from "@mui/material/Container";
 import Avatar from "@mui/material/Avatar";
 import Tooltip from "@mui/material/Tooltip";
 import { authActions } from "../../REDUX/authSlice";
 import { Button, Drawer } from "@mui/material";
-import { Link, useNavigate } from "react-router-dom";
-import LinksComponent from "../layoutRelatedComponents/LinksComponent";
+import { useLocation, useNavigate } from "react-router-dom";
+import LinksComponent from "../layoutRelatedComponents/linksRelated/LinksComponent";
 import { useAppDispatch, useAppSelector } from "../../REDUX/bigPie";
 import ThemeSwitcher from "../layoutRelatedComponents/ThemeSwitcher";
 import { ROUTER } from "../../Router/ROUTER";
-import NavLinkComponent from "../layoutRelatedComponents/NavComponents";
+import OrderComponents from "./OrderComponents";
+import UserCardTemplate from "../../components/userRelatedComponents/UserCardTemplate";
+
 function Header() {
+  const orders = useAppSelector((bigPie) => bigPie.orderReducer);
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const auth = useAppSelector((bigPie) => bigPie.authReducer);
   const loggedin = auth.isLoggedIn;
   const userInfo = auth.user;
-  const [anchorElNav, setAnchorElNav] = React.useState<
-    null | (EventTarget & HTMLElement)
-  >(null);
+  const [anchorElNav, setAnchorElNav] = React.useState(false);
   const [anchorElUser, setAnchorElUser] = React.useState<
     null | (EventTarget & HTMLElement)
   >(null);
+  const { pathname } = useLocation();
+
   const handleLogOut = () => {
     setAnchorElUser(null);
     dispatch(authActions.logout());
     // navigate("/cards");
   };
-  const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
-    setAnchorElNav(event.currentTarget);
+  const handleOpenNavMenu = () => {
+    setAnchorElNav(true);
   };
   const handleOpenUserMenu = (event: React.MouseEvent<HTMLElement>) => {
     if (!loggedin) {
@@ -44,7 +46,7 @@ function Header() {
     }
   };
   const handleCloseNavMenu = () => {
-    setAnchorElNav(null);
+    setAnchorElNav(false);
   };
   const handleCloseUserMenu = () => {
     setAnchorElUser(null);
@@ -52,13 +54,15 @@ function Header() {
   const handeleUserNameClick = () => {
     navigate(ROUTER.HOME);
   };
+
+  //TODO: sidebar order view
   return (
-    <AppBar
-      position="sticky"
-      sx={{ border: "1px solid transparent", borderRadius: 10, width: "80vw" }}
-    >
-      <Container maxWidth="xl">
-        <Toolbar disableGutters sx={{ justifyContent: "space-evenly" }}>
+    <AppBar sx={{ height: "7vh", width: "100%", zIndex: 99 }}>
+      <Box sx={{ width: "100%", maxWidth: "100%" }}>
+        <Toolbar
+          disableGutters
+          sx={{ justifyContent: "space-evenly", width: "100%" }}
+        >
           <Box
             sx={{
               // flexGrow: 1,
@@ -98,31 +102,58 @@ function Header() {
               </Box>
             </Drawer>
           </Box>
-          <Box sx={{ display: { xs: "flex", md: "flex" } }}>
-            {userInfo && (
-              <Typography
-                variant="h6"
-                noWrap
-                component="a"
-                onClick={handeleUserNameClick}
-                sx={{
-                  mr: 2,
-                  fontFamily: "monospace",
-                  fontWeight: 700,
-                  letterSpacing: ".3rem",
-                  color: "inherit",
-                  textDecoration: "none",
-                  cursor: "pointer",
-                }}
-              >
-                {userInfo.name.firstName}
-              </Typography>
-            )}
-            {userInfo && <ThemeSwitcher />}
-          </Box>
           <Box
             sx={{
-              // flexGrow: 1,
+              display: {
+                xs: "flex",
+                md: "flex",
+                alignItems: "center",
+              },
+            }}
+          >
+            {userInfo && (
+              <Box sx={{ flexGrow: 1 }}>
+                <Typography
+                  variant="h6"
+                  noWrap
+                  component="a"
+                  onClick={handeleUserNameClick}
+                  sx={{
+                    mr: 2,
+                    fontFamily: "monospace",
+                    fontWeight: 700,
+                    letterSpacing: ".3rem",
+                    color: "inherit",
+                    textDecoration: "none",
+                    cursor: "pointer",
+                  }}
+                >
+                  {userInfo.name.firstName}
+                </Typography>{" "}
+                <ThemeSwitcher />
+              </Box>
+            )}
+          </Box>
+          {orders[1]?.products.length > 0 &&
+            !pathname.includes("/order/neworder") && (
+              <Box
+                sx={{
+                  display: {
+                    xs: "none",
+                    sm: "none",
+                    md: "none",
+                    xl: "block",
+                  },
+                  flexGrow: 0.4,
+                  height: "100%",
+                }}
+              >
+                <OrderComponents />{" "}
+              </Box>
+            )}
+          <Box
+            sx={{
+              flexGrow: 0,
               display: {
                 xs: "none",
                 md: "flex",
@@ -130,11 +161,12 @@ function Header() {
             }}
           >
             <LinksComponent loggedin={loggedin} userInfo={userInfo} />
-          </Box>
-          <Box sx={{ flexGrow: 0 }}>
+          </Box>{" "}
+          <Box sx={{ flexGrow: 0, position: "relative" }}>
             <Tooltip title="Open settings">
               <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
                 <Avatar
+                  sx={{ position: "static", zIndex: 3 }}
                   alt="Remy Sharp"
                   src={
                     userInfo
@@ -144,38 +176,58 @@ function Header() {
                 />
               </IconButton>
             </Tooltip>
-            <Menu
-              sx={{ mt: "45px" }}
-              id="menu-appbar"
-              anchorEl={anchorElUser}
-              anchorOrigin={{
-                vertical: "top",
-                horizontal: "right",
-              }}
-              keepMounted
-              transformOrigin={{
-                vertical: "top",
-                horizontal: "right",
-              }}
-              open={Boolean(anchorElUser)}
-              onClose={handleCloseUserMenu}
-            >
-              <Box sx={{ flexDirection: "column", display: "flex" }}>
-                {" "}
-                <Button
-                  onClick={() => {
-                    navigate(`${ROUTER.PROFILE}/${userInfo?._id}`);
-                    handleCloseUserMenu();
+
+            {userInfo && (
+              <Menu
+                id="menu-appbar"
+                anchorEl={anchorElUser}
+                sx={{
+                  top: 15,
+                  // position: "relative",
+                  ".MuiPaper-root": {
+                    backgroundColor: "divider", // Change this to your desired color
+                    filter: "drop-shadow(0px 2px 8px rgba(0,0,0,0.32))",
+                  },
+                }}
+                keepMounted
+                transformOrigin={{
+                  vertical: "top",
+                  horizontal: "left",
+                }}
+                open={Boolean(anchorElUser)}
+                onClose={handleCloseUserMenu}
+              >
+                <Box
+                  sx={{
+                    flexDirection: "column",
+                    display: "flex",
+                    p: 1,
+                    justifyContent: "space-between",
+                    position: "relative",
                   }}
                 >
-                  profile
-                </Button>
-                <Button onClick={handleLogOut}>logout</Button>
-              </Box>
-            </Menu>
+                  {" "}
+                  <UserCardTemplate
+                    user={userInfo}
+                    close={handleCloseUserMenu}
+                  />
+                  <Button
+                    variant="contained"
+                    onClick={handleLogOut}
+                    sx={{
+                      color: "text.primary",
+                      boxShadow: "none",
+                      bgcolor: "divider",
+                    }}
+                  >
+                    logout
+                  </Button>
+                </Box>
+              </Menu>
+            )}
           </Box>
         </Toolbar>
-      </Container>
+      </Box>
     </AppBar>
   );
 }

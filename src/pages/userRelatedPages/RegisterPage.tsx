@@ -1,9 +1,7 @@
 import {
-  Alert,
   Avatar,
   Box,
   Button,
-  Card,
   Grid,
   IconButton,
   InputAdornment,
@@ -11,16 +9,15 @@ import {
   Typography,
 } from "@mui/material";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
-
 import React, { Fragment, useState } from "react";
-import { ErrorObj, ILocation, IRegiserInputs } from "../../@types/global";
-import { validateRegister } from "../../validation/validationSchema/registerSchema";
+import { ErrorObj, ILocation, IRegiserInputs } from "../../@types/inputs";
+import { validateRegister } from "../../validation/validationSchema/userSchema/registerSchema";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { storage } from "../../config/fireBase";
-import { normalRegister } from "../../normalizedData/registerFormat";
-import axios from "axios";
+import { normalRegister } from "../../normalizedData/userTypesData/registerFormat";
 import { useNavigate } from "react-router-dom";
-import GoogleMapToEdit from "../../layout/layoutRelatedComponents/GoogleMapEdit";
+import GoogleMapToEdit from "../../layout/layoutRelatedComponents/maps/GoogleMapEdit";
+import sendData from "../../hooks/useSendData";
 const defaultAvatarUrl =
   "https://firebasestorage.googleapis.com/v0/b/social-media-27267.appspot.com/o/images%2FavatarDefaulPic.png?alt=media&token=1ca6c08e-505f-465b-bcd9-3d47c9b1c28f";
 const RegisterPage = () => {
@@ -38,15 +35,19 @@ const RegisterPage = () => {
     alt: "",
     url: defaultAvatarUrl,
   });
+  const requierd = [
+    "firstName",
+    "lastName",
+    "email",
+    "phoneNumber",
+    "password",
+    "passwordConfirmation",
+  ];
   const [showPassword, setShowPassword] = useState(false);
   const [showConfiremedPassword, setShowConfiremedPassword] = useState(false);
   const [errorsState, setErrorsState] = useState<ErrorObj | null>(null);
   const [img, setImg] = useState<null | File>(null);
   const [secondtrychance, setSeconrychance] = useState(false);
-  const [progress, setProgress] = useState(0);
-  const [buffer, setBuffer] = useState(10);
-  const [upload, setUpload] = useState(false);
-
   const handleSetPic = (e: React.ChangeEvent<HTMLInputElement>) => {
     const inputElement = e.target as HTMLInputElement;
     if (inputElement.files) {
@@ -84,7 +85,6 @@ const RegisterPage = () => {
     }
   };
   const handleLocationChange = (location: ILocation) => {
-    let updatedInputs = { ...inputs };
     Object.entries(location).map(([key, value]) => {
       setInputs((currentState) => ({
         //update the state  values
@@ -102,19 +102,7 @@ const RegisterPage = () => {
         const upload = storage.ref(`images/${img.name}`).put(img);
         upload.on(
           "state_changed",
-          (snapshot) => {
-            setUpload(true);
-            const progress = Math.round(
-              (snapshot.bytesTransferred / snapshot.totalBytes) * 100
-            );
-            if (progress === 100) {
-              setProgress(100);
-              setBuffer(10);
-            } else {
-              setProgress(progress);
-              setBuffer(progress + 10);
-            }
-          },
+          (snapshot) => {},
           (error) => {
             console.log(error);
           },
@@ -125,7 +113,7 @@ const RegisterPage = () => {
               .getDownloadURL()
               .then(async (url) => {
                 inputs.url = url;
-                sendData(inputs);
+                register(inputs);
               });
           }
         );
@@ -133,28 +121,21 @@ const RegisterPage = () => {
       //there is no image that he wish to upload so jest send to server
       if (!img) {
         inputs.url = defaultAvatarUrl;
-        sendData(inputs);
+        register(inputs);
       }
     } catch (e) {
       //register have failed
       console.log(e);
     }
   };
-  const sendData = (inputs: IRegiserInputs) => {
+  const register = async (inputs: IRegiserInputs) => {
     //set up the inputs ready to send to the server
     inputs.buildingNumber = Number(inputs.buildingNumber);
     try {
       const data = normalRegister(inputs);
-      axios
-        .post("/users/register", data)
-        .then(function (res) {
-          //user created go to verifiey it
-          navigate(`/verify/${inputs.email}`);
-        })
-        .catch(function (e) {
-          console.log(e);
-          // the request failed(from server)
-        });
+      await sendData({ url: "/users/register", data: data, method: "post" });
+      //user created go to verifiey it
+      navigate(`/verify/${inputs.email}`);
     } catch (e) {
       // the request failed(not from server)
     }
@@ -165,7 +146,7 @@ const RegisterPage = () => {
         component="form"
         noValidate
         onSubmit={(e) => handleSubmit(e)}
-        sx={{ marginTop: 4, marginBottom: 4 }}
+        sx={{ p: 2, pt: 8 }}
       >
         <Grid container sx={{ mt: 0 }}>
           <Grid container item md={3} sm={2} xs={1}></Grid>
@@ -176,13 +157,12 @@ const RegisterPage = () => {
             sm={8}
             xs={10}
             sx={{
-              // marginTop: 8,
               display: "flex",
               bgcolor: "divider",
               boxShadow: 3,
               borderRadius: 2,
               py: 4,
-              px: { xs: 5, sm: 4, md: 8 },
+              px: { xs: 1, sm: 4, md: 8 },
             }}
           >
             {" "}
@@ -232,7 +212,7 @@ const RegisterPage = () => {
                       md={5}
                       sx={{ pb: "1em", m: "auto", mb: "0px" }}
                     >
-                      {error && key !== "url" && (
+                      {error && (
                         <Typography
                           variant="body2"
                           sx={{ mb: 0.5, color: "red" }}
@@ -243,8 +223,10 @@ const RegisterPage = () => {
 
                       <TextField
                         fullWidth
+                        name={key}
                         autoFocus={key === "firstName" ? true : false}
                         id={key}
+                        required={requierd.includes(key)}
                         label={key.charAt(0).toUpperCase() + key.slice(1)}
                         placeholder={
                           key === "passwordConfirmation"
@@ -313,84 +295,90 @@ const RegisterPage = () => {
                 )
               );
             })}{" "}
-            <Grid
-              container
-              item
-              spacing={2}
-              xs={12}
-              sm={12}
-              md={12}
-              sx={{
-                marginTop: 2,
-                justifyContent: "center",
-                mb: 2,
-                // flexDirection: "column",
-              }}
-            >
-              <Box sx={{ p: 1 }}>
-                <GoogleMapToEdit
-                  getLocation={handleLocationChange}
-                  theme={"light"}
-                />
-              </Box>
-              <Box
+            <Grid container spacing={4}>
+              <Grid
+                container
+                item
+                xs={12}
+                sm={6}
+                md={6}
                 sx={{
-                  p: 1,
-                  display: "flex",
-                  flexDirection: "column",
-                  justifyContent: "space-between",
-                  alignContent: "center",
+                  justifyContent: "center",
+                  height: "18.5em",
+                  overflow: "hidden",
                 }}
               >
-                <Typography variant="h6" sx={{ color: "text.primary" }}>
-                  user profile pic:
-                </Typography>
-                <label htmlFor="file-input">
-                  <Avatar
-                    sx={{
-                      width: 70,
-                      height: 70,
-                      cursor: "pointer",
-                      marginLeft: "auto",
-                      marginRight: "auto",
-                    }}
-                    alt="user pic"
-                    src={img ? URL.createObjectURL(img) : defaultAvatarUrl}
-                  />{" "}
-                  <input
-                    id="file-input"
-                    style={{ display: "none" }}
-                    className="file-input"
-                    type="file"
-                    accept="image/*"
-                    onChange={(e) => handleSetPic(e)}
-                  />
-                </label>{" "}
-                <Box sx={{ width: 200, height: "3em" }}>
-                  <TextField
-                    id="alt"
-                    // label={"alt".charAt(0).toUpperCase() + "alt".slice(1)}
-                    placeholder="decrib the pic"
-                    value={inputs.alt}
-                    onChange={(e) => handleInputsChange(e)}
-                    inputProps={{ style: { padding: 7 } }}
+                <Box sx={{ p: 1, width: "100%" }}>
+                  <GoogleMapToEdit
+                    getLocation={handleLocationChange}
+                    theme={"light"}
                   />
                 </Box>
-              </Box>
-
-              {(errorsState !== null
-                ? true
-                : secondtrychance
-                ? false
-                : true) && (
-                <Typography
-                  variant="body2"
-                  sx={{ color: "text.primary", mt: 1 }}
+              </Grid>
+              <Grid
+                container
+                item
+                xs={12}
+                sm={6}
+                md={6}
+                sx={{
+                  justifyContent: "center",
+                  height: "100%",
+                }}
+              >
+                <Box
+                  sx={{
+                    display: "flex",
+                    flexDirection: "column",
+                    justifyContent: "space-between",
+                    height: "100%",
+                    alignContent: "center",
+                  }}
                 >
-                  * if you dont fill up the inputs you cant register
-                </Typography>
-              )}
+                  <Typography
+                    variant="h6"
+                    sx={{ color: "text.primary", textAlign: "center" }}
+                  >
+                    user profile pic:
+                  </Typography>
+                  <label htmlFor="file-input">
+                    <Avatar
+                      sx={{
+                        width: 70,
+                        height: 70,
+                        cursor: "pointer",
+                        marginLeft: "auto",
+                        marginRight: "auto",
+                      }}
+                      alt="user pic"
+                      src={img ? URL.createObjectURL(img) : defaultAvatarUrl}
+                    />{" "}
+                    <input
+                      id="file-input"
+                      style={{ display: "none" }}
+                      className="file-input"
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => handleSetPic(e)}
+                    />
+                  </label>{" "}
+                  <Box sx={{ width: 200, height: "3em" }}>
+                    <TextField
+                      id="alt"
+                      placeholder="decrib the pic"
+                      value={inputs.alt}
+                      onChange={(e) => handleInputsChange(e)}
+                      inputProps={{ style: { padding: 7 } }}
+                    />
+                  </Box>
+                </Box>
+              </Grid>
             </Grid>
+            {(errorsState !== null ? true : secondtrychance ? false : true) && (
+              <Typography variant="body2" sx={{ color: "red", mt: 1 }}>
+                * if you dont fill up the inputs you cant register
+              </Typography>
+            )}
             <Button
               type="submit"
               fullWidth

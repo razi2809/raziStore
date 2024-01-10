@@ -5,4 +5,6 @@ export const ROUTER = {
   PASSWORDRESET: "/forgotPassword",
   LOGIN: "/login",
   PROFILE: "/profile",
+  BUSINESS: "/business",
+  ORDER: "/order",
 };

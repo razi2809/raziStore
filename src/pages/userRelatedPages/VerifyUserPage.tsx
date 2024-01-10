@@ -8,10 +8,11 @@ import {
 } from "@mui/material";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import React, { Fragment, useState } from "react";
-import { ErrorObj, IVerifyInputs } from "../../@types/global";
-import axios from "axios";
+import { ErrorObj, IVerifyInputs } from "../../@types/inputs";
 import { useNavigate, useParams } from "react-router-dom";
-import { validateVerify } from "../../validation/validationSchema/verifyUserSchema";
+import { validateVerify } from "../../validation/validationSchema/userSchema/verifyUserSchema";
+import sendData from "../../hooks/useSendData";
+import { ROUTER } from "../../Router/ROUTER";
 const VerifyUserPage = () => {
   const navigate = useNavigate();
   let { email } = useParams();
@@ -51,19 +52,14 @@ const VerifyUserPage = () => {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
-      axios
-        .post(`/users/verify/${inputs.email}/${inputs.verificationCode}`)
-        .then(function (res) {
-          //user created go to verifiey it
-          navigate(`/verify/${inputs.email}`);
-        })
-        .catch(function (e) {
-          console.log(e);
-          // the request failed(from server)
-        });
+      await sendData({
+        url: `/users/verify/${inputs.email}/${inputs.verificationCode}`,
+        method: "post",
+      });
+      navigate(ROUTER.LOGIN);
     } catch (e) {
       //register have failed
       console.log(e);
@@ -75,7 +71,7 @@ const VerifyUserPage = () => {
         component="form"
         noValidate
         onSubmit={(e) => handleSubmit(e)}
-        sx={{ m: 25 }}
+        sx={{ p: 25 }}
       >
         <Grid container sx={{ mt: 0 }}>
           <Grid container item md={3} sm={2} xs={1}></Grid>
@@ -147,6 +143,8 @@ const VerifyUserPage = () => {
 
                     <TextField
                       fullWidth
+                      name={key}
+                      required
                       disabled={key === "email" ? true : false}
                       autoFocus={key === "verificationCode" ? true : false}
                       id={key}
@@ -182,7 +180,7 @@ const VerifyUserPage = () => {
                 : secondtrychance
                 ? false
                 : true) && (
-                <Typography variant="body2" sx={{ color: "text.primary" }}>
+                <Typography variant="body2" sx={{ color: "RED" }}>
                   * if you dont fill up the inputs you cant be verified
                 </Typography>
               )}

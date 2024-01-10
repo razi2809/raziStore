@@ -6,19 +6,22 @@ import {
   Grid,
   IconButton,
   InputAdornment,
+  Step,
+  StepButton,
+  Stepper,
   TextField,
   Typography,
 } from "@mui/material";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import React, { useState } from "react";
 import { CSSTransition } from "react-transition-group";
-
-import { ErrorObj, IResetPasswordInputs } from "../../@types/global";
-
-import { validateEmail } from "../../validation/validationSchema/emailScema";
+import { ErrorObj, IResetPasswordInputs } from "../../@types/inputs";
+import { validateEmail } from "../../validation/validationSchema/userSchema/emailScema";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
-import { validateResetPassword } from "../../validation/validationSchema/resetPasswordSchema";
-import axios from "axios";
+import { validateResetPassword } from "../../validation/validationSchema/userSchema/resetPasswordSchema";
+import sendData from "../../hooks/useSendData";
+import { useNavigate } from "react-router-dom";
+import { ROUTER } from "../../Router/ROUTER";
 
 const ResetPasswordPage = () => {
   const [inputs, setInputs] = useState<IResetPasswordInputs>({
@@ -32,8 +35,13 @@ const ResetPasswordPage = () => {
   const [errorsState, setErrorsState] = useState<ErrorObj | null>(null);
   const [sendRequest, setSendRequest] = useState(false);
   const [display, setIsdisplay] = useState(false);
+  const navigate = useNavigate();
   const [secondtrychance, setSeconrychance] = useState(false);
-
+  const steps = ["enter user email", "enter new password", "reset password"];
+  const [activeStep, setActiveStep] = React.useState(0);
+  const [completed, setCompleted] = React.useState<{
+    [k: number]: boolean;
+  }>({});
   const handleInputsChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
@@ -55,67 +63,77 @@ const ResetPasswordPage = () => {
       const joiResponse = validateResetPassword(updatedInputs);
 
       setErrorsState(joiResponse);
+      if (!joiResponse) {
+        handleComplete();
+      }
     }
     if (e.target.id === "passwordConfirmation") {
       const joiResponse = validateResetPassword(updatedInputs);
       setSeconrychance(true);
       setErrorsState(joiResponse);
+      if (!joiResponse) {
+        handleComplete();
+      }
     }
   };
-  const handleReset = () => {
+  const handleReset = async () => {
     try {
       const data = {
         password: inputs.password,
         passwordConfirmation: inputs.passwordConfirmation,
       };
-      axios
-        .post(
-          `users/resetPassword/${inputs.email}/${inputs.passwordResetCode}`,
-          data
-        )
-        .then(function (res) {
-          console.log(res);
-        })
-        .catch(function (e) {
-          console.log(e);
-          // the request failed(from server)
-        });
+      await sendData({
+        url: `users/resetPassword/${inputs.email}/${inputs.passwordResetCode}`,
+        data: data,
+        method: "post",
+      });
+      handleComplete();
+      navigate(ROUTER.LOGIN);
     } catch (e) {
       console.log(e);
     }
   };
 
-  const handleRequest = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleRequest = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     try {
       const data = inputs.email;
-
-      axios
-        .post(`/users/forgotpassword`, { email: data })
-        .then(function (res) {
-          setSendRequest(true);
-          setSeconrychance(false);
-          setTimeout(() => {
-            setIsdisplay(true);
-          }, 500);
-        })
-        .catch(function (e) {
-          console.log(e);
-          // the request failed(from server)
-        });
+      await sendData({
+        url: `/users/forgotpassword`,
+        data: { email: data },
+        method: "post",
+      });
+      handleComplete();
+      setSendRequest(true);
+      setSeconrychance(false);
+      setTimeout(() => {
+        setIsdisplay(true);
+      }, 500);
     } catch (e) {
       //register have failed
       console.log(e);
     }
   };
+  const handleComplete = () => {
+    const newCompleted = completed;
+    newCompleted[activeStep] = true;
+
+    setCompleted(newCompleted);
+    handleNext();
+  };
+  const handleNext = () => {
+    const newActiveStep = activeStep + 1;
+    setActiveStep(newActiveStep);
+  };
+
   return (
     <Grid>
       <Box
         component="form"
         noValidate
         onSubmit={(e) => handleRequest(e)}
-        sx={{ marginTop: 4, marginBottom: 14 }}
+        sx={{ p: 20 }}
       >
         <Grid container sx={{ mt: 0 }}>
           <Grid container item md={2} sm={2} xs={1}></Grid>
@@ -164,6 +182,19 @@ const ResetPasswordPage = () => {
                 reset password
               </Typography>
             </Grid>
+            <Box
+              sx={{ display: "flex", justifyContent: "center", width: "100%" }}
+            >
+              <Stepper nonLinear activeStep={activeStep} sx={{ mb: 1 }}>
+                {steps.map((label, index) => (
+                  <Step key={label} completed={completed[index]}>
+                    <StepButton disabled color="inherit">
+                      {label}
+                    </StepButton>
+                  </Step>
+                ))}
+              </Stepper>
+            </Box>
             <Grid item spacing={2} xs={12} container>
               <Grid item spacing={2} xs={12} container>
                 <Grid
@@ -180,24 +211,19 @@ const ResetPasswordPage = () => {
                   }}
                 >
                   {errorsState && errorsState["email"] && (
-                    <Alert
-                      variant="filled"
-                      severity="warning"
-                      sx={{
-                        height: "4em",
-                        display: "flex",
-                        alignItems: "center",
-                      }}
-                    >
+                    <Typography variant="body2" sx={{ mb: 0.5, color: "red" }}>
+                      {" "}
                       *{errorsState["email"]}
-                    </Alert>
+                    </Typography>
                   )}
 
                   <TextField
                     fullWidth
+                    required
                     autoFocus
                     disabled={sendRequest}
-                    id={"email"}
+                    id="email"
+                    name="email"
                     label={"email".charAt(0).toUpperCase() + "email".slice(1)}
                     placeholder={`Enter your email`}
                     value={inputs.email}
@@ -224,22 +250,19 @@ const ResetPasswordPage = () => {
                     }}
                   >
                     {errorsState && errorsState["passwordResetCode"] && (
-                      <Alert
-                        variant="filled"
-                        severity="warning"
-                        sx={{
-                          height: "4em",
-                          display: "flex",
-                          alignItems: "center",
-                        }}
+                      <Typography
+                        variant="body2"
+                        sx={{ mb: 0.5, color: "red" }}
                       >
-                        {errorsState["passwordResetCode"]}
-                      </Alert>
+                        *{errorsState["passwordResetCode"]}
+                      </Typography>
                     )}
                     <TextField
                       fullWidth
+                      required
                       autoFocus
-                      id={"passwordResetCode"}
+                      id="passwordResetCode"
+                      name="passwordResetCode"
                       label={
                         "password reset code".charAt(0).toUpperCase() +
                         "password reset code".slice(1)
@@ -271,22 +294,19 @@ const ResetPasswordPage = () => {
                 >
                   <Grid container item md={6} sm={6} xs={12}>
                     {errorsState && errorsState["password"] && (
-                      <Alert
-                        variant="filled"
-                        severity="warning"
-                        sx={{
-                          height: "4em",
-                          display: "flex",
-                          alignItems: "center",
-                        }}
+                      <Typography
+                        variant="body2"
+                        sx={{ mb: 0.5, color: "red" }}
                       >
-                        * {errorsState["password"]}
-                      </Alert>
+                        *{errorsState["password"]}
+                      </Typography>
                     )}
                     <TextField
                       fullWidth
+                      required
                       autoFocus
-                      id={"password"}
+                      id="password"
+                      name="password"
                       label={
                         "password".charAt(0).toUpperCase() + "password".slice(1)
                       }
@@ -332,23 +352,20 @@ const ResetPasswordPage = () => {
                     }}
                   >
                     {errorsState && errorsState["passwordConfirmation"] && (
-                      <Alert
-                        variant="filled"
-                        severity="warning"
-                        sx={{
-                          height: "4em",
-                          display: "flex",
-                          alignItems: "center",
-                        }}
+                      <Typography
+                        variant="body2"
+                        sx={{ mb: 0.5, color: "red" }}
                       >
-                        * {errorsState["passwordConfirmation"]}
-                      </Alert>
+                        *{errorsState["passwordConfirmation"]}
+                      </Typography>
                     )}
                     <TextField
                       fullWidth
                       autoFocus
+                      required
                       sx={{ mt: 1 }}
-                      id={"passwordConfirmation"}
+                      id="passwordConfirmation"
+                      name="passwordConfirmation"
                       label={
                         "passwordConfirmation".charAt(0).toUpperCase() +
                         "passwordConfirmation".slice(1)
@@ -401,8 +418,8 @@ const ResetPasswordPage = () => {
                 : secondtrychance
                 ? false
                 : true) && (
-                <Typography variant="body2" sx={{ color: "text.primary" }}>
-                  * if you dont fill up the inputs you cant be verified
+                <Typography variant="body2" sx={{ color: "red" }}>
+                  * if you dont fill up the inputs you cant reset the password
                 </Typography>
               )}
             </Grid>
@@ -414,7 +431,6 @@ const ResetPasswordPage = () => {
                   errorsState !== null ? true : secondtrychance ? false : true
                 }
                 variant="contained"
-                sx={{ mt: 2 }}
               >
                 send reset code
               </Button>
@@ -426,7 +442,6 @@ const ResetPasswordPage = () => {
                   errorsState !== null ? true : secondtrychance ? false : true
                 }
                 variant="contained"
-                sx={{ mt: 2 }}
                 onClick={handleReset}
               >
                 reset password

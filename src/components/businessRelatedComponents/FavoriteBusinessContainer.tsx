@@ -1,0 +1,90 @@
+import React, { FC, useCallback, useEffect, useState } from "react";
+import { Day, IBusiness } from "../../@types/business";
+import { Grid, Pagination } from "@mui/material";
+import BusinessTamplateComponent from "./BusinessTamplateComponent";
+import { useAppSelector } from "../../REDUX/bigPie";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import usePagination from "../../hooks/usePagination";
+interface Props {
+  businesses: IBusiness[];
+  setBusinessLike: (like: boolean, businesses: IBusiness) => void;
+}
+
+const FavoriteBusinessContainer: FC<Props> = ({
+  businesses,
+  setBusinessLike,
+}) => {
+  const user = useAppSelector((bigpie) => bigpie.authReducer);
+  const navigate = useNavigate();
+  const [likedBusinesses, setLikedBusinesses] = useState<IBusiness[]>([]);
+  const {
+    currentData: pageBusinessData,
+    currentPage,
+    numPages,
+    goToPage,
+  } = usePagination(likedBusinesses);
+
+  useEffect(() => {
+    // filter liked businesses whenever the 'businesses' prop changes
+
+    if (businesses.length === 0) return;
+    const LikedBusiness = businesses.filter((business) =>
+      business.likes.includes(user.user?._id)
+    );
+    // Redirect if no businesses are liked after filtering
+
+    if (LikedBusiness.length === 0) {
+      navigate(`/home#${encodeURIComponent("all businesses")}`);
+    }
+    setLikedBusinesses(LikedBusiness);
+  }, [businesses]);
+
+  const handlePageChange = (_: React.ChangeEvent<unknown>, newPage: number) => {
+    //when he clicks to move a page then navigate to a new one
+    //the page state will upate automaticly
+    // setPage(newPage);
+    goToPage(newPage);
+    window.scrollTo({ top: 0, left: 0 });
+    navigate(
+      `/home?page=${newPage}#${encodeURIComponent("favorite businesses")}`
+    );
+  };
+
+  return (
+    <>
+      <Grid container spacing={2} sx={{ pl: 8, pr: 8, pb: 3 }}>
+        {pageBusinessData?.length > 0 &&
+          pageBusinessData.map((business) => (
+            <Grid
+              item
+              md={4}
+              sm={6}
+              xs={12}
+              key={business._id}
+              // sx={{ height: "100%" }}
+            >
+              <BusinessTamplateComponent
+                setBusinessLike={setBusinessLike}
+                business={business}
+              />
+            </Grid>
+          ))}
+      </Grid>
+      {numPages > 1 && (
+        <Pagination
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+            alignContent: "center",
+            mt: 1,
+          }}
+          count={numPages}
+          page={currentPage}
+          onChange={handlePageChange}
+        />
+      )}
+    </>
+  );
+};
+
+export default FavoriteBusinessContainer;

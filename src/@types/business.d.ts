@@ -1,18 +1,23 @@
-import { IAddress, IImage } from "./global";
+import { IAddress, IImage } from "./user";
+
 interface IOpeningHoursInDay {
   opening?: string;
   closing?: string;
   close?: boolean;
 }
-interface IOpeningHours {
-  Monday: IOpeningHoursInDay;
-  Tuesday: IOpeningHoursInDay;
-  Wednesday: IOpeningHoursInDay;
-  Thursday: IOpeningHoursInDay;
-  Friday: IOpeningHoursInDay;
-  Saturday: IOpeningHoursInDay;
-  Sunday: IOpeningHoursInDay;
-}
+type Day =
+  | "Sunday"
+  | "Monday"
+  | "Tuesday"
+  | "Wednesday"
+  | "Thursday"
+  | "Friday"
+  | "Saturday";
+
+/* interface IOpeningHours {
+  [day in Day]: IOpeningHoursInDay;
+} */
+interface IOpeningHours extends Record<Day, IOpeningHoursInDay> {}
 
 interface IBusiness {
   _id: Types.ObjectId;
@@ -20,7 +25,7 @@ interface IBusiness {
   businessPhoneNumber: string;
   businessName: string;
   businessDescription: string;
-  address: IAddress;
+  address: IAddresss;
   businessImage: IImage;
   OpeningHours: IOpeningHours;
   products: string[];
@@ -28,4 +33,5 @@ interface IBusiness {
   likes: string[];
   orders: string[];
 }
-export { IBusiness };
+
+export { IBusiness, Day, IOpeningHours, IOpeningHoursInDay };

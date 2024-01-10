@@ -1,16 +1,33 @@
-import { IAddress, IImage, IName } from "./global";
+import { IAddress, IImage, IName } from "./inputs";
 
 interface Iuser {
   email: string;
   phoneNumber: string;
   name: IName;
-  address: IAddress;
+  address: IAddress[];
   image: IImage;
   isAdmin: boolean;
   isBusiness: boolean;
+  verified: boolean;
   orders: string[];
   theme: "dark" | "light";
   _id: Types.ObjectId;
+}
+interface IImage {
+  url: string;
+  alt?: string;
+}
+interface IName {
+  firstName: string;
+  lastName: string;
+}
+interface IAddress {
+  id: Types.ObjectId;
+  addressName: string;
+  state: string;
+  street: string;
+  city: string;
+  buildingNumber: number;
 }
 /* interface IuserValidate {
     email: string;
@@ -30,4 +47,4 @@ interface Iuser {
     password:string,
     passworConfirmation:string
 } */
-export { Iuser };
+export { Iuser, IAddress, IImage, IName };

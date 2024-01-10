@@ -4,9 +4,7 @@ interface Prop {
   children: ReactNode;
 }
 const MainComponent: FC<Prop> = ({ children }) => {
-  return (
-    <Box sx={{ m: 0, p: 0, border: "1px solid transparent" }}>{children}</Box>
-  );
+  return <Box>{children}</Box>;
 };
 
 export default MainComponent;
