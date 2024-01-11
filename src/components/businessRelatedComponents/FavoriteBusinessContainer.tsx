@@ -1,10 +1,11 @@
 import React, { FC, useCallback, useEffect, useState } from "react";
 import { Day, IBusiness } from "../../@types/business";
-import { Grid, Pagination } from "@mui/material";
+import { Box, Grid, Pagination, Typography } from "@mui/material";
 import BusinessTamplateComponent from "./BusinessTamplateComponent";
 import { useAppSelector } from "../../REDUX/bigPie";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import usePagination from "../../hooks/usePagination";
+import SelectFilterBusiness from "../searchFilters/businessRelatedSelect/SelectFilterBusiness";
 interface Props {
   businesses: IBusiness[];
   setBusinessLike: (like: boolean, businesses: IBusiness) => void;
@@ -52,7 +53,26 @@ const FavoriteBusinessContainer: FC<Props> = ({
 
   return (
     <>
-      <Grid container spacing={2} sx={{ pl: 8, pr: 8, pb: 3 }}>
+      <Box>
+        <Grid
+          container
+          item
+          xs={12}
+          sx={{ mt: 1, justifyContent: "space-around", mb: 4 }}
+        >
+          <>
+            <Box sx={{ display: "flex", justifyContent: "space-around" }}>
+              <Typography variant="h3" sx={{ ml: 4, color: "text.primary" }}>
+                favorite businesses{" "}
+              </Typography>
+            </Box>
+            <Box sx={{ width: 350, zIndex: 3 }}>
+              <SelectFilterBusiness data={likedBusinesses} />
+            </Box>
+          </>
+        </Grid>
+      </Box>
+      <Grid container spacing={2} sx={{ pl: 4, pr: 4, pb: 3 }}>
         {pageBusinessData?.length > 0 &&
           pageBusinessData.map((business) => (
             <Grid

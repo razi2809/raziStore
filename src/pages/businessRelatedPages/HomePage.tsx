@@ -10,6 +10,7 @@ import { useAppSelector } from "../../REDUX/bigPie";
 import AllBusinessContainer from "../../components/businessRelatedComponents/AllBusinessContainer";
 import OpenBusinessContainer from "../../components/businessRelatedComponents/OpenBusinessContainer";
 import FavoriteBusinessContainer from "../../components/businessRelatedComponents/FavoriteBusinessContainer";
+import SelectFilterBusiness from "../../components/searchFilters/businessRelatedSelect/SelectFilterBusiness";
 // Define the sections that can be displayed on the home page.
 
 const sectionOptions: Section[] = [
@@ -87,80 +88,69 @@ const HomePage = () => {
             justifyContent: "center",
             mt: 2,
             mb: 4,
+            flexWrap: "wrap",
           }}
         >
-          {sectionOptions.map((section) => (
-            <Box key={section} sx={{ display: "flex" }}>
-              <Link to={`#${section}`} style={{ textDecoration: "none" }}>
-                <Box
-                  sx={{
-                    mr: 2,
-                    borderRadius: 20,
-                    height: "100%",
-                    display: "flex",
-                    alignItems: "center",
-                    position: "relative",
-                    cursor: "pointer",
-                  }}
-                  onClick={() => setActiveSection(section)}
-                >
-                  <Typography
-                    variant="h6"
-                    sx={{
-                      color: "text.primary",
-                      p: 1,
-                    }}
-                  >
-                    {section}
-                  </Typography>
-                  {activeSection === section && (
-                    <motion.span
-                      style={{
-                        position: "absolute",
-                        top: 50,
-                        height: "2px",
-                        width: "100%",
-                        backgroundColor:
-                          theme.palette.mode === "light" ? "black" : "white",
+          {sectionOptions.map((section) => {
+            const isLoggedIn =
+              section === "favorite businesses"
+                ? user.isLoggedIn
+                  ? true
+                  : false
+                : true;
+            return (
+              isLoggedIn && (
+                <Box key={section} sx={{ display: "flex" }}>
+                  <Link to={`#${section}`} style={{ textDecoration: "none" }}>
+                    <Box
+                      sx={{
+                        mr: 2,
+                        borderRadius: 20,
+                        height: "100%",
+                        display: "flex",
+                        alignItems: "center",
+                        position: "relative",
+                        cursor: "pointer",
                       }}
-                      layoutId="activeSectionHomePage"
-                      transition={{
-                        type: "spring",
-                        stiffness: 380,
-                        damping: 30,
-                      }}
+                      onClick={() => setActiveSection(section)}
                     >
-                      {" "}
-                    </motion.span>
-                  )}
+                      <Typography
+                        variant="h6"
+                        sx={{
+                          color: "text.primary",
+                          p: 1,
+                        }}
+                      >
+                        {section}
+                      </Typography>
+                      {activeSection === section && (
+                        <motion.span
+                          style={{
+                            position: "absolute",
+                            top: 50,
+                            height: "2px",
+                            width: "100%",
+                            backgroundColor:
+                              theme.palette.mode === "light"
+                                ? "black"
+                                : "white",
+                          }}
+                          layoutId="activeSectionHomePage"
+                          transition={{
+                            type: "spring",
+                            stiffness: 380,
+                            damping: 30,
+                          }}
+                        >
+                          {" "}
+                        </motion.span>
+                      )}
+                    </Box>
+                  </Link>
                 </Box>
-              </Link>
-            </Box>
-          ))}
-        </Box>
-        <Box>
-          <Grid
-            container
-            item
-            xs={12}
-            sx={{ mt: 1, justifyContent: "flex-start", mb: 4 }}
-          >
-            {activeSection === "all businesses" && (
-              <Typography variant="h3" sx={{ ml: 4, color: "text.primary" }}>
-                all businesses{" "}
-              </Typography>
-            )}
-            {activeSection === "open businesses" && (
-              <Typography variant="h3" sx={{ ml: 4, color: "text.primary" }}>
-                open businesses{" "}
-              </Typography>
-            )}{" "}
-            {activeSection === "favorite businesses" && (
-              <Typography variant="h3" sx={{ ml: 4, color: "text.primary" }}>
-                favorite businesses{" "}
-              </Typography>
-            )}
-          </Grid>
+              )
+            );
+          })}
         </Box>
         <Grid>
           {activeSection === "all businesses" && (
