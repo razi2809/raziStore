@@ -17,6 +17,7 @@ import ThemeSwitcher from "../layoutRelatedComponents/ThemeSwitcher";
 import { ROUTER } from "../../Router/ROUTER";
 import OrderComponents from "./OrderComponents";
 import UserCardTemplate from "../../components/userRelatedComponents/UserCardTemplate";
+import notify from "../../services/toastService";
 
 function Header() {
   const orders = useAppSelector((bigPie) => bigPie.orderReducer);
@@ -41,6 +42,7 @@ function Header() {
   };
   const handleOpenUserMenu = (event: React.MouseEvent<HTMLElement>) => {
     if (!loggedin) {
+      notify.warning("you need to log in first");
     } else {
       setAnchorElUser(event.currentTarget);
     }
@@ -57,7 +59,7 @@ function Header() {
 
   //TODO: sidebar order view
   return (
-    <AppBar sx={{ height: "7vh", width: "100%", zIndex: 99 }}>
+    <AppBar sx={{ height: "4em", width: "100%", zIndex: 99 }}>
       <Box sx={{ width: "100%", maxWidth: "100%" }}>
         <Toolbar
           disableGutters

@@ -1,19 +1,13 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
   useLocation,
   useNavigate,
   useParams,
   useSearchParams,
 } from "react-router-dom";
-import { Day, IBusiness } from "../../@types/business";
+import { IBusiness } from "../../@types/business";
 import { IProduct } from "../../@types/product";
-import {
-  Box,
-  Grid,
-  SpeedDial,
-  SpeedDialAction,
-  Typography,
-} from "@mui/material";
+import { Box, Grid, Typography } from "@mui/material";
 import { AnimatePresence, motion } from "framer-motion";
 import { useAppDispatch, useAppSelector } from "../../REDUX/bigPie";
 import { orderActions } from "../../REDUX/orderSlice";
@@ -24,22 +18,24 @@ import GoogleMapToView from "../../layout/layoutRelatedComponents/maps/GoogleMap
 import LoaderComponent from "../../layout/layoutRelatedComponents/LoaderComponent";
 import useFetch from "../../hooks/useFetch";
 import ShareIcon from "@mui/icons-material/Share";
-import SpeedDialIcon from "@mui/material/SpeedDialIcon";
 import { ROUTER } from "../../Router/ROUTER";
 import EditIcon from "@mui/icons-material/Edit";
 import AddIcon from "@mui/icons-material/Add";
 import useBusinessOpen from "../../hooks/useBusinessOpen";
+import SelectFilterProducts from "../../components/searchFilters/productsRelatedSelect/SelectFilterProducts";
+import CustomSpeedDial from "../../layout/layoutRelatedComponents/CustomSpeedDial";
+import notify from "../../services/toastService";
 export interface ISelected {
   productId: string | null;
   category: string | null;
 }
-const actions = [
-  { icon: <AddIcon />, name: "add product" },
-  { icon: <EditIcon />, name: "edit" },
-  { icon: <ShareIcon />, name: "Share" },
-];
+const actions: { icon: JSX.Element; name: "add product" | "edit" | "Share" }[] =
+  [
+    { icon: <AddIcon />, name: "add product" },
+    { icon: <EditIcon />, name: "edit" },
+    { icon: <ShareIcon />, name: "Share" },
+  ];
 const BusinessPage = () => {
-  const [open, setOpen] = useState(false);
   const dispatch = useAppDispatch();
   const { BusinessId } = useParams();
   const location = useLocation();
@@ -52,9 +48,9 @@ const BusinessPage = () => {
     category,
     productId,
   });
-  const { pathname } = useLocation();
+  const { pathname } = location;
   const navigate = useNavigate();
-  const { data, error } = useFetch(`/business/${BusinessId}`);
+  const { data, error, loading } = useFetch(`/business/${BusinessId}`);
   // const business = data.business as IBusiness;
   // const products = data.products as IProduct[];
   const [business, setBusiness] = useState<IBusiness | null>(null);
@@ -64,9 +60,8 @@ const BusinessPage = () => {
     // Check if there's an error after fetching data.
     if (error) {
       // Handle the error, e.g., by setting an error message in the state,
-      // logging the error, or showing a toast notification to the user.
-      console.error("An error occurred while fetching businesses:", error);
-      // Optionally, you can set a state here to show an error message in the UI.
+      //or showing a toast notification to the user.
+      notify.error(error.message);
     } else if (data) {
       // If there's no error and data is present, update the businesses state.
       setBusiness(data.business);
@@ -74,6 +69,7 @@ const BusinessPage = () => {
     }
   }, [data, error]);
   useEffect(() => {
+    if (!location.hash.substring(1)) return;
     const element = document.getElementById(location.hash.substring(1));
     if (element) {
       window.scrollTo({
@@ -91,24 +87,26 @@ const BusinessPage = () => {
     navigate(
       `${pathname}?item=${selectedProduct.productId}&category=${selectedProduct.category}`
     );
-  }, [selectedProduct]);
+  }, [selectedProduct, navigate, pathname]);
 
-  const updateOrder = (product: IProduct, quantity: number) => {
-    if (business) {
+  const updateOrder = useCallback(
+    (product: IProduct, quantity: number) => {
+      if (!business) return;
       dispatch(orderActions.updateOrder({ product, quantity, business }));
-    } else {
-      // Handle the case when business is null
-    }
-  };
-  const handleActionClick = (actionName: string) => {
+    },
+    [business, dispatch]
+  );
+  const handleActionClick = (actionName: "Share" | "add product" | "edit") => {
     if (!business) return;
-    setOpen(false);
     switch (actionName) {
       case "Share":
         handleShare();
         break;
       case "add product":
         navigate(`${ROUTER.BUSINESS}/${business._id}/addNewProduct`);
+        break;
+      case "edit":
+        navigate(`${ROUTER.BUSINESS}/${business._id}/BusinessDetails`);
         break;
     }
   };
@@ -119,7 +117,7 @@ const BusinessPage = () => {
       navigator.share({
         title: `${business.businessName}`,
         text: "Check out my awesome business",
-        url: ` https://raziStore${ROUTER.BUSINESS}/${business._id}.com`,
+        url: `https://razi2809.github.io/raziStore${ROUTER.BUSINESS}/${business._id}`,
       });
     } else {
       console.log("Web Share API is not supported in your browser");
@@ -140,23 +138,11 @@ const BusinessPage = () => {
         >
           {" "}
           <Box sx={{ transform: "translateZ(0px)", flexGrow: 1 }}>
-            <SpeedDial
-              ariaLabel="SpeedDial tooltip example"
-              sx={{ position: "absolute", top: 50, right: 50 }}
-              icon={<SpeedDialIcon />}
-              onClose={() => setOpen(false)}
-              onOpen={() => setOpen(true)}
-              open={open}
-              direction="down"
-            >
-              {actions.map((action) => (
-                <SpeedDialAction
-                  key={action.name}
-                  icon={action.icon}
-                  onClick={(e) => handleActionClick(action.name)}
-                />
-              ))}
-            </SpeedDial>
+            <CustomSpeedDial
+              actions={actions}
+              onActionClick={handleActionClick}
+              canEdit={user.user?.isBusiness ? user.user.isBusiness : false}
+            />
           </Box>
           <Box
             sx={{
@@ -175,18 +161,36 @@ const BusinessPage = () => {
         </Box>
         <Box
           sx={{
-            // height: "4vh",
             bgcolor: "secondary.main",
             borderBottom: "1px solid rgba(32, 33, 37, 0.12)",
             display: "flex",
-
-            justifyContent: "flex-end",
+            justifyContent: "space-between",
             p: 1,
             position: "sticky",
-            top: "7vh",
+            top: "4em",
             zIndex: 3,
           }}
         >
+          <Box
+            sx={{
+              width: 350,
+              zIndex: 3,
+              display: {
+                md: "flex",
+                sm: "flex",
+                xs: "none",
+              },
+              alignItems: "center",
+              ml: 3,
+            }}
+          >
+            <Box sx={{ width: "100%" }}>
+              <SelectFilterProducts
+                data={products}
+                setSelectedProduct={setSelectedProduct}
+              />
+            </Box>
+          </Box>
           <Box
             sx={{
               mr: 4,
@@ -246,7 +250,7 @@ const BusinessPage = () => {
                   </Link>
                 </Box>
               ))}
-          </Box>
+          </Box>{" "}
         </Box>
         <Grid container sx={{ bgcolor: "divider" }}>
           {business?.categories &&
@@ -279,11 +283,9 @@ const BusinessPage = () => {
             sx={{
               position: "absolute",
               bgcolor: "divider",
-              // inset: "0px 0px 33.46% ",
               inset: 0,
               height: "50%",
               width: "100%",
-              // p: 1,
               top: 4,
               borderRadius: 3,
               zIndex: 1,
@@ -330,12 +332,17 @@ const BusinessPage = () => {
                     />
                   </motion.div>
                 );
+              } else {
+                return null;
               }
             })}
         </AnimatePresence>
       </Grid>
     );
-  } else return <LoaderComponent />;
+  } else if (loading) {
+    <LoaderComponent />;
+  }
+  return null;
 };
 
 export default BusinessPage;

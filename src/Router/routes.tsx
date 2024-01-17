@@ -9,12 +9,17 @@ import RegisterPage from "../pages/userRelatedPages/RegisterPage";
 import ResetPasswordPage from "../pages/userRelatedPages/ResetPasswordPage";
 import HomePage from "../pages/businessRelatedPages/HomePage";
 import BusinessPage from "../pages/businessRelatedPages/BusinessPage";
-import PlaceAnOrdePage from "../pages/ordersRelatedPages/PlaceAnOrdePage";
+import PlaceAnOrdePage from "../pages/ordersRelatedPages/PlaceAnOrderPage";
 import VerifyGuard from "../Guards/VerifyGuard";
 import OrderViewPage from "../pages/ordersRelatedPages/OrderViewPage";
 import ProfilePage from "../pages/userRelatedPages/ProfilePage";
 import CreateBusiness from "../pages/businessRelatedPages/CreateBusinessPage";
 import AddNewProduct from "../pages/businessRelatedPages/AddNewProduct";
+import AdminGuard from "../Guards/AdminGuard";
+import BusinessGuard from "../Guards/BusinessGuard";
+import CRMPage from "../pages/userRelatedPages/CRMPage";
+import BusinessDetails from "../pages/businessRelatedPages/BusinessDetails";
+import UnVerifyGuard from "../Guards/UnVerifyGuard";
 
 const Router = () => {
   return (
@@ -25,7 +30,6 @@ const Router = () => {
         path={ROUTER.REGISTER}
         element={
           <AuthPrevent>
-            {" "}
             <RegisterPage />
           </AuthPrevent>
         }
@@ -42,7 +46,6 @@ const Router = () => {
         path={ROUTER.PASSWORDRESET}
         element={
           <AuthPrevent>
-            {" "}
             <ResetPasswordPage />
           </AuthPrevent>
         }
@@ -50,18 +53,25 @@ const Router = () => {
       <Route
         path={`${ROUTER.VERIFY}/:email`}
         element={
-          <AuthPrevent>
+          <UnVerifyGuard>
             <VerifyUserPage />
-          </AuthPrevent>
+          </UnVerifyGuard>
         }
       />
       <Route
         path={`${ROUTER.PROFILE}/:userId`}
         element={
           <AuthGuard>
-            {" "}
-            <ProfilePage />{" "}
+            <ProfilePage />
           </AuthGuard>
+        }
+      />
+      <Route
+        path={`${ROUTER.CRM}`}
+        element={
+          <AdminGuard>
+            <CRMPage />
+          </AdminGuard>
         }
       />
       <Route path={`${ROUTER.BUSINESS}`}>
@@ -73,11 +83,33 @@ const Router = () => {
         />
         <Route
           path={`${ROUTER.BUSINESS}/:BusinessId/addNewProduct`}
-          element={<AddNewProduct />}
+          element={
+            <AuthGuard>
+              <BusinessGuard>
+                <AddNewProduct />
+              </BusinessGuard>
+            </AuthGuard>
+          }
+        />
+        <Route
+          path={`${ROUTER.BUSINESS}/:BusinessId/businessDetails`}
+          element={
+            <AuthGuard>
+              <BusinessGuard>
+                <BusinessDetails />
+              </BusinessGuard>
+            </AuthGuard>
+          }
         />
         <Route
           path={`${ROUTER.BUSINESS}/newBusiness`}
-          element={<CreateBusiness />}
+          element={
+            <AuthGuard>
+              <AdminGuard>
+                <CreateBusiness />
+              </AdminGuard>
+            </AuthGuard>
+          }
         />
       </Route>
       <Route path={`${ROUTER.ORDER}`}>
@@ -93,7 +125,14 @@ const Router = () => {
             </AuthGuard>
           }
         />
-        <Route path={`${ROUTER.ORDER}/:orderId`} element={<OrderViewPage />} />
+        <Route
+          path={`${ROUTER.ORDER}/:orderId`}
+          element={
+            <AuthGuard>
+              <OrderViewPage />
+            </AuthGuard>
+          }
+        />
       </Route>
     </Routes>
   );

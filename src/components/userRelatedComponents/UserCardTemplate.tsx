@@ -4,6 +4,7 @@ import { Avatar, Box, Button, Card, Typography } from "@mui/material";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import { useNavigate } from "react-router-dom";
 import { ROUTER } from "../../Router/ROUTER";
+
 interface Props {
   user: Iuser;
   close: () => void;

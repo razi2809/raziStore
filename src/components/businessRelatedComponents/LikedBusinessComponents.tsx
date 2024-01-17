@@ -1,4 +1,4 @@
-import { FC, useState } from "react";
+import { FC, memo, useState } from "react";
 import { IBusiness } from "../../@types/business";
 import { Box, Card, CardContent, CardMedia, Typography } from "@mui/material";
 
@@ -85,4 +85,4 @@ const LikedBusinessComponents: FC<Props> = ({ business }) => {
     </Card>
   );
 };
-export default LikedBusinessComponents;
+export default memo(LikedBusinessComponents);

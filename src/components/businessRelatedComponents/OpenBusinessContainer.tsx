@@ -1,13 +1,14 @@
 import React, { FC, useCallback, useEffect, useState } from "react";
 import { Day, IBusiness } from "../../@types/business";
 import { Box, Grid, Pagination, Typography } from "@mui/material";
-import BusinessTamplateComponent from "./BusinessTamplateComponent";
+import BusinessTamplateComponent from "./BusinessTemplateComponent";
 import usePagination from "../../hooks/usePagination";
 import { useNavigate } from "react-router-dom";
 import SelectFilterBusiness from "../searchFilters/businessRelatedSelect/SelectFilterBusiness";
+import { ROUTER } from "../../Router/ROUTER";
 interface Props {
   businesses: IBusiness[];
-  setBusinessLike: (like: boolean, businesses: IBusiness) => void;
+  setBusinessLike: (like: boolean, businessId: string) => void;
 }
 
 const OpenBusinessContainer: FC<Props> = ({ businesses, setBusinessLike }) => {
@@ -64,7 +65,7 @@ const OpenBusinessContainer: FC<Props> = ({ businesses, setBusinessLike }) => {
     // Redirect if no businesses are open after filtering
 
     if (OpenBusinesses.length === 0) {
-      navigate(`/home#${encodeURIComponent("all businesses")}`);
+      navigate(`${ROUTER.HOME}#${encodeURIComponent("all businesses")}`);
     }
 
     SetOpenBusinesses(OpenBusinesses);
@@ -75,7 +76,9 @@ const OpenBusinessContainer: FC<Props> = ({ businesses, setBusinessLike }) => {
     //the page state will upate automaticly
     goToPage(newPage);
     window.scrollTo({ top: 0, left: 0 });
-    navigate(`/home?page=${newPage}#${encodeURIComponent("open businesses")}`);
+    navigate(
+      `${ROUTER.HOME}?page=${newPage}#${encodeURIComponent("open businesses")}`
+    );
   };
   return (
     <>
@@ -92,8 +95,17 @@ const OpenBusinessContainer: FC<Props> = ({ businesses, setBusinessLike }) => {
                 open businesses{" "}
               </Typography>
             </Box>
-            <Box sx={{ width: 350, zIndex: 3 }}>
-              <SelectFilterBusiness data={openBusinesses} />
+            <Box
+              sx={{
+                width: 350,
+                zIndex: 3,
+                display: "flex",
+                alignItems: "center",
+              }}
+            >
+              <Box sx={{ width: "100%" }}>
+                <SelectFilterBusiness data={openBusinesses} />
+              </Box>
             </Box>
           </>
         </Grid>

@@ -7,17 +7,20 @@ import {
   CardContent,
   CardMedia,
   Checkbox,
+  IconButton,
+  Tooltip,
   Typography,
 } from "@mui/material";
 import { useAppDispatch, useAppSelector } from "../../REDUX/bigPie";
-import ShareIcon from "@mui/icons-material/Share";
+import ShareOutlinedIcon from "@mui/icons-material/ShareOutlined";
 import { Favorite, FavoriteBorder } from "@mui/icons-material";
 import { ROUTER } from "../../Router/ROUTER";
 import ClearIcon from "@mui/icons-material/Clear";
-import axios from "axios";
+import { AxiosError } from "axios";
 import CountStateComponents from "../../layout/layoutRelatedComponents/CountStateComponents";
 import { orderActions } from "../../REDUX/orderSlice";
 import sendData from "../../hooks/useSendData";
+import notify from "../../services/toastService";
 interface Props {
   product: IProduct;
   category: string | null;
@@ -25,7 +28,6 @@ interface Props {
   canOrder: boolean;
 }
 
-const label = { inputProps: { "aria-label": "Checkbox demo" } };
 const ProductTamplateDisplay: FC<Props> = ({
   product,
   category,
@@ -52,14 +54,22 @@ const ProductTamplateDisplay: FC<Props> = ({
     e.stopPropagation();
 
     try {
+      const res = await sendData({
+        url: `/product/${product._id}`,
+        method: "patch",
+      });
       setLike(!like);
-
-      await sendData({ url: `/product/${product._id}`, method: "patch" });
       setProductLike(!like, product._id);
+      notify.success(res.message);
     } catch (e) {
-      console.log(e);
+      if (e instanceof AxiosError) {
+        notify.error(e.response?.data.message);
+      } else {
+        notify.error("An unknown error occurred");
+      }
     }
   };
+
   const setProductLike = (like: boolean, productId: string) => {
     if (!user.isLoggedIn) {
       return;
@@ -81,10 +91,10 @@ const ProductTamplateDisplay: FC<Props> = ({
       navigator.share({
         title: `${product.productName}`,
         text: "Check out my awesome business",
-        url: ` https://raziStore${ROUTER.BUSINESS}/${product.businessId}?item=${product._id}&category=${category}.com`,
+        url: `https://razi2809.github.io/raziStore${ROUTER.BUSINESS}/${product.businessId}?item=${product._id}&category=${category}`,
       });
     } else {
-      console.log("Web Share API is not supported in your browser");
+      notify.error("Web Share API is not supported in your browser");
     }
   };
   const handleClick = (e: React.MouseEvent) => {
@@ -119,25 +129,29 @@ const ProductTamplateDisplay: FC<Props> = ({
         ></CardMedia>
         <div style={{ position: "absolute", top: 0, right: 0, zIndex: 2 }}>
           {user && user.isLoggedIn && (
-            <Checkbox
-              {...label}
-              checked={like}
-              onClick={(e) => handleProductLike(e)}
-              icon={<FavoriteBorder />}
-              checkedIcon={<Favorite />}
-            />
+            <Tooltip title="like">
+              <Checkbox
+                inputProps={{
+                  "aria-label": "like",
+                }}
+                checked={like}
+                onClick={(e) => handleProductLike(e)}
+                icon={<FavoriteBorder />}
+                checkedIcon={<Favorite />}
+              />
+            </Tooltip>
           )}
-          <Checkbox
-            {...label}
-            onClick={(e) => handleShare(e)}
-            icon={<ShareIcon />}
-            checkedIcon={<ShareIcon />}
-          />{" "}
+          <Tooltip title="share">
+            <IconButton onClick={(e) => handleShare(e)}>
+              <ShareOutlinedIcon />{" "}
+            </IconButton>
+          </Tooltip>
         </div>
         <div style={{ position: "absolute", top: 0, left: 0, zIndex: 2 }}>
           <Checkbox
-            {...label}
-            // onClick={(e) => handleShare(e)}
+            inputProps={{
+              "aria-label": "exit",
+            }}
             icon={<ClearIcon />}
             checkedIcon={<ClearIcon />}
           />{" "}
@@ -176,7 +190,6 @@ const ProductTamplateDisplay: FC<Props> = ({
           sx={{
             justifyContent: "center",
             display: "flex",
-            // height: "70%",
             mt: 3,
           }}
         >
@@ -253,40 +266,5 @@ const ProductTamplateDisplay: FC<Props> = ({
     </Card>
   );
 };
-/*  <Box
-            sx={{
-              textTransform: "none",
-              fontSize: 16,
-              // height: "70%",
-              backgroundColor: "primary.main",
-              color: "white",
-              borderRadius: 1,
-              display: "flex",
-              alignItems: "center",
-              boxShadow:
-                " 0px 3px 1px -2px rgba(0,0,0,0.2), 0px 2px 2px 0px rgba(0,0,0,0.14), 0px 1px 5px 0px rgba(0,0,0,0.12)",
-              justifyContent: "center",
-            }}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <Fab
-              aria-label="add"
-              sx={{ bgcolor: "secondary.main", scale: "0.6" }}
-              onClick={() => setCount(count + 1)}
-              disabled={count >= product.productQuantity}
-            >
-              <AddIcon />
-            </Fab>
-            <Typography variant="body1" sx={{ color: "secondary.main" }}>
-              {count}
-            </Typography>
-            <Fab
-              aria-label="add"
-              sx={{ bgcolor: "secondary.main", scale: "0.6" }}
-              disabled={count < 2}
-              onClick={() => setCount(count - 1)}
-            >
-              <RemoveIcon />
-            </Fab>
-          </Box> */
+
 export default ProductTamplateDisplay;

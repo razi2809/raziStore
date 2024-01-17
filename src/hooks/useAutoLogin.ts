@@ -15,26 +15,36 @@ const useAutoLogin = () => {
       if (!tokenoOBj.token) return null; // if no token dont even run the function and return null
       const dataFromToken = jwtDecode<ITokenPayload>(tokenoOBj.token);
 
-      if (!skipTokenTest) {
-        return await axios
-          .get(`/users/${dataFromToken.userId}`)
-          .then(function (res) {
-            // when log in successfully run this block
-            // return the data of the user
-            dispatch(authActions.login(res.data.user));
-            return { user: res.data.user as Iuser, authorized: true };
-          })
-          .catch(function (e) {
-            // when log in failed run this block
-            //ade send the resulte
-            return { err: e, authorized: false };
-          });
+      if (skipTokenTest) return null;
+      try {
+        const res = await axios.get(`/users/${dataFromToken.userId}`);
+        dispatch(authActions.login(res.data.user));
+        return {
+          user: res.data.user as Iuser,
+          authorized: true,
+          local: tokenoOBj.local,
+        };
+      } catch (error) {
+        let errorMessage: string;
+
+        if (axios.isAxiosError(error) && error.response) {
+          // If it's an Axios error with a response
+          errorMessage = error.response.data.message;
+        } else if (error instanceof Error) {
+          // If it's a standard JS Error, use its message
+
+          errorMessage = error.message;
+        } else {
+          // For any other type of error,  generic message
+          errorMessage = "An unknown error occurred";
+        }
+
+        return { err: errorMessage, authorized: false };
       }
     } catch (err) {
       // when there was error unrelated to the server like invailed token
-      return { err: "token decode failed plese log in", authorized: false };
+      return { err: "token decode failed please log in", authorized: false };
     }
-    return null;
   };
 };
 

@@ -1,13 +1,23 @@
-import React, { FC, useEffect, useState } from "react";
+import React, { FC, useState } from "react";
 import { Iuser } from "../../@types/user";
-import { Avatar, Box, Button, Fab, Grid, Typography } from "@mui/material";
+import {
+  Avatar,
+  Box,
+  Button,
+  CircularProgress,
+  Grid,
+  Typography,
+} from "@mui/material";
 import { IBusiness } from "../../@types/business";
-import LikedBusinessComponents from "../businessRelatedComponents/LikedBusinessComponents";
-import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import { motion } from "framer-motion";
 import { IOrderData } from "../../@types/order";
-import OrderHistoryComponents from "../orderRelatedComponents/OrderHistoryComponents";
+import { storage } from "../../config/fireBase";
+import notify from "../../services/toastService";
+import sendData from "../../hooks/useSendData";
+import { AxiosError } from "axios";
+import { useAppDispatch, useAppSelector } from "../../REDUX/bigPie";
+import { authActions } from "../../REDUX/authSlice";
+import UserLikedPlacesComponents from "../businessRelatedComponents/UserLikedPlaces";
+import OrderComponents from "../orderRelatedComponents/OrderComponents";
 
 interface Props {
   user: Iuser;
@@ -16,40 +26,94 @@ interface Props {
 }
 const PersonalInfo: FC<Props> = ({ user, userLikedPlaces, orderHistory }) => {
   const [img, setImg] = useState<null | File>(null);
-  const [likedPlaces, setLikedPlaces] = useState<IBusiness[] | null>(
-    userLikedPlaces
-  );
-
-  const [orders, setOrders] = useState<IOrderData[] | null>(orderHistory);
-  const [businessIndex, SetBusinessIndex] = useState(1);
-  const [orderIndex, setOrderIndex] = useState(1);
-  const TOTAL_PER_PAGE = 4;
-
-  useEffect(() => {
-    //  handling order history pagination
-    if (!orderHistory) return;
-    setOrders(orderHistory.slice(orderIndex - 1, TOTAL_PER_PAGE * orderIndex));
-  }, [orderHistory, orderIndex]);
-  useEffect(() => {
-    // handling liked businesses pagination
-    if (!userLikedPlaces) return;
-    setLikedPlaces(
-      userLikedPlaces.slice(businessIndex - 1, TOTAL_PER_PAGE * businessIndex)
-    );
-  }, [businessIndex, userLikedPlaces]);
+  const [loading, setLoading] = React.useState(false);
+  const myUser = useAppSelector((bigPie) => bigPie.authReducer.user);
+  const [url, setUrl] = useState<string | null>(null);
+  const dispatch = useAppDispatch();
+  const [successUpload, setSuccessUpload] = useState(false);
   const handleSetPic = (e: React.ChangeEvent<HTMLInputElement>) => {
     const inputElement = e.target as HTMLInputElement;
+
     if (inputElement.files) {
       setImg(inputElement.files[0]);
+      handleImageUpload(inputElement.files[0]);
     } else {
       setImg(null);
     }
   };
+  const handleImageUpload = async (selectedImage: File) => {
+    setLoading(true);
+    const hideLoading = notify.loading("Uploading image...");
+    try {
+      const uploadTask = storage
+        .ref(`images/${selectedImage.name}`)
+        .put(selectedImage);
+      uploadTask.on(
+        "state_changed",
+        (snapshot) => {},
+        (error) => {
+          hideLoading();
+          notify.error(error.message);
+          setLoading(false);
+        },
+        async () => {
+          const downloadURL = await storage
+            .ref("images")
+            .child(selectedImage.name)
+            .getDownloadURL();
+          await sendPictureToServer(downloadURL, hideLoading);
+        }
+      );
+    } catch (error) {
+      // Handle any additional errors
+      hideLoading();
+      notify.error("An unknown error occurred");
+      setLoading(false);
+    }
+  };
+  const sendPictureToServer = async (url: string, hideLoading: () => void) => {
+    try {
+      const res = await sendData({
+        url: `users/image/${user._id}`,
+        method: "patch",
+        data: { image: url },
+      });
+      if (user._id === myUser?._id) {
+        dispatch(
+          authActions.editTemperarlyPic({
+            url,
+          })
+        );
+      }
+      hideLoading();
+      setSuccessUpload(true);
+      setLoading(false);
+      setUrl(url);
+      notify.success(res.message);
+    } catch (e) {
+      setLoading(false);
+      hideLoading();
+      if (e instanceof AxiosError) {
+        notify.error(e.response?.data.message);
+      } else {
+        notify.error("An unknown error occurred");
+      }
+    }
+  };
 
   return (
-    <Grid sx={{ pl: "10vw", pr: "10vw" }}>
-      <Box sx={{ p: 3 }}>
-        <Box sx={{ display: "flex" }}>
+    <Grid>
+      <Box sx={{ p: 2 }}>
+        <Box
+          sx={{
+            display: {
+              md: "flex",
+              sm: "flex",
+              xs: "block",
+            },
+            p: 1,
+          }}
+        >
           <Box
             sx={{
               display: "flex",
@@ -68,23 +132,39 @@ const PersonalInfo: FC<Props> = ({ user, userLikedPlaces, orderHistory }) => {
             >
               <Avatar
                 sx={{ width: 75, height: 75, zIndex: 1 }}
-                src={img ? URL.createObjectURL(img) : user.image.url}
+                src={successUpload ? url! : user.image.url}
                 alt={user.image.alt || "User Profile Picture"}
               />
+              {loading && (
+                <CircularProgress
+                  size={90}
+                  sx={{
+                    color: "secondary.main",
+                    position: "absolute",
+                    top: -7,
+                    left: -7,
+                    zIndex: 1,
+                  }}
+                />
+              )}
               <Box
                 sx={{
                   position: "absolute",
                   width: "115%",
                   height: "115%",
                   borderRadius: 50,
-                  // top: 0,
                   bgcolor: "white",
                   zIndex: 0,
                 }}
               ></Box>
             </Box>{" "}
-            <label htmlFor="file-input">
-              <Button variant="contained" sx={{ mt: 2 }} component="span">
+            <label htmlFor={!loading ? "file-input" : undefined}>
+              <Button
+                variant="contained"
+                sx={{ mt: 2 }}
+                component="span"
+                disabled={loading}
+              >
                 edit
               </Button>
             </label>
@@ -140,148 +220,8 @@ const PersonalInfo: FC<Props> = ({ user, userLikedPlaces, orderHistory }) => {
             </Box>
           </Box>
         </Box>
-        {userLikedPlaces && userLikedPlaces.length > 0 && (
-          <Grid sx={{ mt: 2 }}>
-            <Grid item xs={12}>
-              <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-                <Box>
-                  <Typography
-                    variant="h4"
-                    sx={{ color: "text.primary", textAlign: "start" }}
-                  >
-                    loved places
-                  </Typography>
-                </Box>
-                {userLikedPlaces.length > 4 && (
-                  <Box>
-                    <Fab
-                      sx={{
-                        bgcolor: "secondary.main",
-                        mr: 2,
-                        height: 20,
-                        width: 35,
-                        zIndex: 1,
-                      }}
-                      disabled={businessIndex === 1}
-                      aria-label="Go Back"
-                      onClick={() => SetBusinessIndex(businessIndex - 1)}
-                    >
-                      <ArrowBackIcon />
-                    </Fab>
-                    <Fab
-                      aria-label="Go forward"
-                      sx={{
-                        bgcolor: "secondary.main",
-                        mr: 2,
-                        height: 20,
-                        width: 35,
-                        zbusinessIndex: 1,
-                      }}
-                      disabled={
-                        businessIndex ===
-                        Math.ceil(userLikedPlaces.length / TOTAL_PER_PAGE)
-                      }
-                      onClick={() => SetBusinessIndex(businessIndex + 1)}
-                    >
-                      <ArrowForwardIcon />
-                    </Fab>
-                  </Box>
-                )}
-              </Box>{" "}
-              <Grid
-                container
-                spacing={2}
-                sx={{ mt: 1, justifyContent: "center" }}
-              >
-                {likedPlaces &&
-                  likedPlaces.length > 0 &&
-                  likedPlaces.map((business) => (
-                    <Grid item md={3} sm={6} xs={12} key={business._id}>
-                      {" "}
-                      <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        transition={{ duration: 0.5 }}
-                        style={{ height: "100%" }}
-                      >
-                        <LikedBusinessComponents business={business} />
-                      </motion.div>
-                    </Grid>
-                  ))}
-              </Grid>{" "}
-            </Grid>
-          </Grid>
-        )}
-        {orderHistory && orderHistory.length > 0 && (
-          <Grid sx={{ mt: 2 }}>
-            <Grid item xs={12}>
-              <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-                <Box>
-                  <Typography
-                    variant="h4"
-                    sx={{ color: "text.primary", textAlign: "start" }}
-                  >
-                    orders
-                  </Typography>
-                </Box>
-                {orderHistory.length > 4 && (
-                  <Box>
-                    <Fab
-                      sx={{
-                        bgcolor: "secondary.main",
-                        mr: 2,
-                        height: 20,
-                        width: 35,
-                        zIndex: 1,
-                      }}
-                      disabled={orderIndex === 1}
-                      onClick={() => setOrderIndex(orderIndex - 1)}
-                    >
-                      <ArrowBackIcon />
-                    </Fab>
-                    <Fab
-                      sx={{
-                        bgcolor: "secondary.main",
-                        mr: 2,
-                        height: 20,
-                        width: 35,
-                        zIndex: 1,
-                      }}
-                      disabled={
-                        businessIndex ===
-                        Math.ceil(orderHistory.length / TOTAL_PER_PAGE)
-                      }
-                      onClick={() => setOrderIndex(businessIndex + 1)}
-                    >
-                      <ArrowForwardIcon />
-                    </Fab>
-                  </Box>
-                )}
-              </Box>{" "}
-              <Grid
-                container
-                spacing={2}
-                sx={{ mt: 1, justifyContent: "center" }}
-              >
-                {orders &&
-                  orders.length > 0 &&
-                  orders.map((order) => (
-                    <Grid item md={3} sm={6} xs={12} key={order._id}>
-                      {" "}
-                      <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        transition={{ duration: 0.5 }}
-                        style={{ height: "100%" }}
-                      >
-                        <OrderHistoryComponents order={order} />
-                      </motion.div>
-                    </Grid>
-                  ))}
-              </Grid>{" "}
-            </Grid>
-          </Grid>
-        )}
+        <UserLikedPlacesComponents userLikedPlaces={userLikedPlaces} />
+        <OrderComponents ordersdata={orderHistory} />
       </Box>
     </Grid>
   );

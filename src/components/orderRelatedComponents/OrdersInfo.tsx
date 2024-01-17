@@ -1,12 +1,12 @@
-import React, { FC } from "react";
+import { FC } from "react";
 import { IOrderData } from "../../@types/order";
-import OrderHistoryComponents from "../orderRelatedComponents/OrderHistoryComponents";
+import OrderCardComponents from "./OrderCardComponents";
 import { Box, Grid, Typography } from "@mui/material";
 interface Props {
-  orderHistory: IOrderData[] | null;
+  orders: IOrderData[] | null;
 }
-const OrderHistoryInfo: FC<Props> = ({ orderHistory }) => {
-  if (orderHistory) {
+const OrdersInfo: FC<Props> = ({ orders }) => {
+  if (orders) {
     return (
       <Grid sx={{ mt: 2, p: 2 }}>
         <Grid item xs={12}>
@@ -16,17 +16,17 @@ const OrderHistoryInfo: FC<Props> = ({ orderHistory }) => {
                 variant="h4"
                 sx={{ color: "text.primary", textAlign: "start" }}
               >
-                order history
+                orders
               </Typography>
             </Box>
           </Box>{" "}
           <Grid container spacing={2} sx={{ mt: 1, justifyContent: "center" }}>
-            {orderHistory &&
-              orderHistory.length > 0 &&
-              orderHistory.map((order) => (
+            {orders &&
+              orders.length > 0 &&
+              orders.map((order) => (
                 <Grid item md={3} sm={6} xs={12} key={order._id}>
                   {" "}
-                  <OrderHistoryComponents order={order} />
+                  <OrderCardComponents order={order} />
                 </Grid>
               ))}
           </Grid>{" "}
@@ -36,4 +36,4 @@ const OrderHistoryInfo: FC<Props> = ({ orderHistory }) => {
   } else return null;
 };
 
-export default OrderHistoryInfo;
+export default OrdersInfo;

@@ -1,16 +1,37 @@
-import React, { FC, Fragment, useState } from "react";
+import { FC, Fragment, useEffect, useState } from "react";
 import { IAddress } from "../../@types/user";
 import { Box, Button, Grid, Typography } from "@mui/material";
-import AddressTamplate from "../addressRelatedComponents/AddressTamplate";
+import AddressTamplate from "../addressRelatedComponents/AddressTemplate";
 import AddAnAddress from "../addressRelatedComponents/AddAnAddress";
 import { motion } from "framer-motion";
 import { useAppSelector } from "../../REDUX/bigPie";
-
-const AddressInfo = () => {
-  const addresses = useAppSelector(
-    (bigPie) => bigPie.authReducer.user?.address
-  );
+import { useParams } from "react-router-dom";
+interface Props {
+  askedUserAddresses: IAddress[];
+}
+const AddressInfo: FC<Props> = ({ askedUserAddresses }) => {
+  const { userId } = useParams();
+  const user = useAppSelector((bigPie) => bigPie.authReducer.user);
+  const [addresses, setAddress] = useState<IAddress[] | null>(null);
+  const [canHeAdd, setCanHeAdd] = useState(false);
   const [addAddress, setAddAddress] = useState(false);
+  useEffect(() => {
+    if (user?.isAdmin) {
+      if (userId === user._id) {
+        //if he admin but he is the asked user disply his own info
+        setAddress(user.address);
+        setCanHeAdd(true);
+      } else {
+        //if he admin and he is not the asked user disply the asked info
+        setAddress(askedUserAddresses);
+      }
+    } else {
+      //if isnt admin show his own address
+      setAddress(user?.address!);
+      setCanHeAdd(true);
+    }
+  }, [userId, user, askedUserAddresses]);
+
   return (
     <Grid sx={{ mt: 2, p: 2 }}>
       <Grid item xs={12}>
@@ -38,34 +59,36 @@ const AddressInfo = () => {
                 <Grid item md={2} xs={0}></Grid>
               </Fragment>
             ))}
-          <Box sx={{ mt: 2 }}>
-            <Button variant="contained" onClick={() => setAddAddress(true)}>
-              add an address
-            </Button>
-            {addAddress && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.5 }}
-                style={{
-                  position: "fixed",
-                  top: 0,
-                  left: 0,
-                  right: 0,
-                  bottom: 0,
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  backgroundColor: "rgba(0, 0, 0, 0.5)",
-                  zIndex: 1000,
-                }}
-                onClick={() => setAddAddress(false)}
-              >
-                <AddAnAddress />
-              </motion.div>
-            )}
-          </Box>
+          {canHeAdd && (
+            <Box sx={{ mt: 2 }}>
+              <Button variant="contained" onClick={() => setAddAddress(true)}>
+                add an address
+              </Button>
+              {addAddress && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.5 }}
+                  style={{
+                    position: "fixed",
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    backgroundColor: "rgba(0, 0, 0, 0.5)",
+                    zIndex: 1000,
+                  }}
+                  onClick={() => setAddAddress(false)}
+                >
+                  <AddAnAddress />
+                </motion.div>
+              )}
+            </Box>
+          )}
         </Grid>
       </Box>
     </Grid>

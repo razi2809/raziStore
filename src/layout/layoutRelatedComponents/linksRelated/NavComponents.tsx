@@ -1,7 +1,6 @@
-import { Box, Typography } from "@mui/material";
-import { FC, Fragment, ReactNode, useEffect, useState } from "react";
+import { Typography } from "@mui/material";
+import { FC, Fragment, useEffect, useState } from "react";
 import { NavLink, useLocation } from "react-router-dom";
-import { text } from "stream/consumers";
 import { motion } from "framer-motion";
 import { useTheme } from "@mui/material/styles";
 
@@ -12,7 +11,6 @@ interface Props {
   }[];
 }
 const NavLinkComponent: FC<Props> = ({ links }) => {
-  const [mouseOver, setMouseOver] = useState(false);
   const [active, setActive] = useState("");
   const location = useLocation();
   const theme = useTheme();
@@ -38,6 +36,9 @@ const NavLinkComponent: FC<Props> = ({ links }) => {
       case "business/newBusiness":
         setActive("create business");
         break;
+      case "crm":
+        setActive("crm system");
+        break;
       default:
         setActive("");
     }
@@ -48,8 +49,6 @@ const NavLinkComponent: FC<Props> = ({ links }) => {
         return (
           <Fragment key={myItem.children}>
             <NavLink
-              onMouseEnter={() => setMouseOver(true)}
-              onMouseLeave={() => setMouseOver(false)}
               to={myItem.to}
               onClick={handlePageNavigate}
               style={{ textDecoration: "none", position: "relative" }}

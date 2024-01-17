@@ -1,28 +1,28 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import useFetch from "../../hooks/useFetch";
 import { IOrderData } from "../../@types/order";
 import LoaderComponent from "../../layout/layoutRelatedComponents/LoaderComponent";
 import { Box, Grid, Typography } from "@mui/material";
+import notify from "../../services/toastService";
 
 const OrderViewPage = () => {
   const { orderId } = useParams();
-  const { data, error } = useFetch(`/order/${orderId}`);
+  const { data, error } = useFetch(`/order/getOrder/${orderId}`);
   // const order = data.order as IOrderData;
   const [order, setOrder] = useState<IOrderData | null>(null);
   useEffect(() => {
-    // Check if there's an error after fetching data.
     if (error) {
       // Handle the error, e.g., by setting an error message in the state,
       // logging the error, or showing a toast notification to the user.
       console.error("An error occurred while fetching businesses:", error);
+      notify.error(error.message);
       // Optionally, you can set a state here to show an error message in the UI.
-    } else if (data && data.businesses) {
+    } else if (data && data.order) {
       // If there's no error and data is present, update the businesses state.
       setOrder(data.order);
     }
   }, [data, error]);
-  console.log(order);
   if (order) {
     return (
       <Grid>

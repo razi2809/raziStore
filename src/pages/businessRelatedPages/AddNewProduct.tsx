@@ -10,20 +10,18 @@ import {
 } from "@mui/material";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import React, { Fragment, useState } from "react";
-import {
-  ErrorObj,
-  ILocation,
-  IProductInputs,
-  IRegiserInputs,
-} from "../../@types/inputs";
+import { ErrorObj, IProductInputs } from "../../@types/inputs";
 import { storage } from "../../config/fireBase";
-import { normalRegister } from "../../normalizedData/userTypesData/registerFormat";
 import { useNavigate, useParams } from "react-router-dom";
 import sendData from "../../hooks/useSendData";
 import { validateNewProduct } from "../../validation/validationSchema/productScema/createNewProduct";
 import { newProductNormalized } from "../../normalizedData/productTypeData/newProduct";
+import UploadPicComponent from "../../components/genericComponents/UploadPicComponent";
+import { ROUTER } from "../../Router/ROUTER";
+import notify from "../../services/toastService";
+import { AxiosError } from "axios";
 const defaultAvatarUrl =
-  "https://firebasestorage.googleapis.com/v0/b/social-media-27267.appspot.com/o/images%2FavatarDefaulPic.png?alt=media&token=1ca6c08e-505f-465b-bcd9-3d47c9b1c28f";
+  "https://hinacreates.com/wp-content/uploads/2021/06/dummy2-450x341.png";
 const AddNewProduct = () => {
   const navigate = useNavigate();
   const [inputs, setInputs] = useState<IProductInputs>({
@@ -51,10 +49,9 @@ const AddNewProduct = () => {
   const [secondtrychance, setSeconrychance] = useState(false);
   const { BusinessId } = useParams();
 
-  const handleSetPic = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const inputElement = e.target as HTMLInputElement;
-    if (inputElement.files) {
-      setImg(inputElement.files[0]);
+  const handleSetPic = (file: File) => {
+    if (file) {
+      setImg(file);
     } else {
       setImg(null);
     }
@@ -71,31 +68,17 @@ const AddNewProduct = () => {
       ...inputs,
       [e.target.id]: e.target.value,
     };
-    if (secondtrychance) {
-      //when its his second try and we gave him the warning then
-      //alert him if its still have an error or if its not
+    if (secondtrychance || e.target.id === "categoryOne") {
+      // Validate using the new inputs
       const joiResponse = validateNewProduct(updatedInputs);
       setErrorsState(joiResponse);
-    }
-    if (e.target.id === "categoryOne") {
-      //check if its the lest input and want to regisert
-      //sende the inpunts to the joi validate
-      //if error from joi then set them and trigerr a alert for each input
-      //if the joi dosent have value it empty so let the user hit submit
-      const joiResponse = validateNewProduct(updatedInputs);
-      setErrorsState(joiResponse);
-      setSeconrychance(true);
+
+      if (e.target.id === "categoryOne") {
+        setSeconrychance(true);
+      }
     }
   };
-  const handleLocationChange = (location: ILocation) => {
-    Object.entries(location).map(([key, value]) => {
-      setInputs((currentState) => ({
-        //update the state  values
-        ...currentState,
-        [key]: value,
-      }));
-    });
-  };
+
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
@@ -140,12 +123,16 @@ const AddNewProduct = () => {
         data: data,
         method: "post",
       });
-      console.log(res);
-
-      //user created go to verifiey it
-      //   navigate(`/verify/${inputs.email}`);
+      notify.success(res.message);
+      navigate(`${ROUTER.HOME}`);
     } catch (e) {
-      // the request failed(not from server)
+      if (e instanceof AxiosError) {
+        console.log(e);
+
+        notify.error(e.response?.data.message);
+      } else {
+        notify.error("An unknown error occurred");
+      }
     }
   };
   return (
@@ -199,7 +186,7 @@ const AddNewProduct = () => {
                   color: "text.primary",
                 }}
               >
-                register
+                add new product
               </Typography>
             </Grid>
             {Object.entries(inputs).map(([key, value]) => {
@@ -271,25 +258,19 @@ const AddNewProduct = () => {
                   >
                     product pic:
                   </Typography>
-                  <label htmlFor="file-input">
-                    <Card sx={{ width: "100%", height: "10em" }}>
-                      <CardMedia
-                        sx={{ height: "200px" }}
-                        component="img"
-                        alt="business pic"
-                        src={img ? URL.createObjectURL(img) : defaultAvatarUrl}
-                      />
-                    </Card>
-
-                    <input
-                      id="file-input"
-                      style={{ display: "none" }}
-                      className="file-input"
-                      type="file"
-                      accept="image/*"
-                      onChange={(e) => handleSetPic(e)}
-                    />
-                  </label>{" "}
+                  <Box sx={{ width: "100%", height: "10em", mb: 1 }}>
+                    {!img && <UploadPicComponent onFileSelect={handleSetPic} />}
+                    {img && (
+                      <Card sx={{ width: "100%", height: "10em" }}>
+                        <CardMedia
+                          sx={{ height: "200px" }}
+                          component="img"
+                          alt="business pic"
+                          src={URL.createObjectURL(img)}
+                        />
+                      </Card>
+                    )}
+                  </Box>
                   <Box sx={{ width: "100%", height: "3em" }}>
                     <TextField
                       id="alt"
@@ -316,7 +297,7 @@ const AddNewProduct = () => {
               }
               variant="contained"
             >
-              regiser{" "}
+              add new product
             </Button>
           </Grid>{" "}
           <Grid container item md={3} sm={2} xs={1}>

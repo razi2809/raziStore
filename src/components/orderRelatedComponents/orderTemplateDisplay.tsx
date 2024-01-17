@@ -1,5 +1,5 @@
 import React, { FC, useState } from "react";
-import { IProduct } from "../../@types/product";
+/*i.mport { IProduct } from "../../@types/product";
 import {
   Box,
   Button,
@@ -7,19 +7,15 @@ import {
   CardContent,
   CardMedia,
   Checkbox,
-  Fab,
-  IconButton,
   Typography,
 } from "@mui/material";
 import { useAppDispatch, useAppSelector } from "../../REDUX/bigPie";
-import AddIcon from "@mui/icons-material/Add";
-import RemoveIcon from "@mui/icons-material/Remove";
+
 import ShareIcon from "@mui/icons-material/Share";
 import { Favorite, FavoriteBorder } from "@mui/icons-material";
 import { ROUTER } from "../../Router/ROUTER";
 import ClearIcon from "@mui/icons-material/Clear";
 import axios from "axios";
-// import { orderActions } from "../../REDUX/orderSlice";
 import CountStateComponents from "../../layout/layoutRelatedComponents/CountStateComponents";
 interface Props {
   product: IProduct;
@@ -27,9 +23,9 @@ interface Props {
   setProductLike: (like: boolean, productId: string) => void;
   deleteFromOrder: (product: IProduct) => void;
   updateOrder: (product: IProduct, count: number) => void;
-}
+}/*  
 
-const orderTamplateDisplay: FC<Props> = ({
+const orderTemplateDisplay: FC<Props> = ({
   product,
   category,
   setProductLike,
@@ -123,7 +119,6 @@ const orderTamplateDisplay: FC<Props> = ({
         <div style={{ position: "absolute", top: 0, left: 0, zIndex: 2 }}>
           <Checkbox
             {...label}
-            // onClick={(e) => handleShare(e)}
             icon={<ClearIcon />}
             checkedIcon={<ClearIcon />}
           />{" "}
@@ -239,4 +234,5 @@ const orderTamplateDisplay: FC<Props> = ({
   );
 };
 
-export default orderTamplateDisplay;
+export default orderTemplateDisplay;
+ */

@@ -2,8 +2,10 @@ import React, { useEffect, useState } from "react";
 import { styled } from "@mui/material/styles";
 import Switch from "@mui/material/Switch";
 import { useAppSelector } from "../../REDUX/bigPie";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import useAutoLogin from "../../hooks/useAutoLogin";
+import sendData from "../../hooks/useSendData";
+import notify from "../../services/toastService";
 
 const MaterialUISwitch = styled(Switch)(({ theme }) => ({
   width: 62,
@@ -65,15 +67,26 @@ export default function ThemeSwitcher() {
   };
   useEffect(() => {
     if (!change) return;
-    const Theme = darkTheme ? "dark" : "light";
-    axios
-      .post("/users/theme", { Theme })
-      .then((response) => {
+    const sendRequest = async () => {
+      const Theme = darkTheme ? "dark" : "light";
+      try {
+        await sendData({
+          url: "/users/theme",
+          data: { Theme },
+          method: "post",
+        });
         login();
-      })
-      .catch((error) => {
-        //should not be an eror
-      });
+      } catch (e) {
+        //should not be an error
+        if (e instanceof AxiosError) {
+          notify.error(e.message);
+        } else {
+          notify.error("An unknown error occurred");
+        }
+      }
+    };
+
+    sendRequest();
   }, [darkTheme]);
   return (
     <MaterialUISwitch

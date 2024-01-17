@@ -29,22 +29,5 @@ interface IAddress {
   city: string;
   buildingNumber: number;
 }
-/* interface IuserValidate {
-    email: string;
-    phoneNumber: string;
-    firstName:string,
-    lastName:string
-    state: string,
-    street: string,
-    city: string,
-    buildingNumber: Number;
-    url:string,
-    alt:string,
-    isAdmin: boolean;
-    isBusiness: boolean;
-    orders: string[];
-    theme: string;
-    password:string,
-    passworConfirmation:string
-} */
+
 export { Iuser, IAddress, IImage, IName };

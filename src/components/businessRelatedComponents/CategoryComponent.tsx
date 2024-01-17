@@ -24,7 +24,6 @@ const CategoryComponent: FC<Props> = ({
   selectedProduct,
   setActiveSection,
 }) => {
-  const user = useAppSelector((bigPie) => bigPie.authReducer);
   const { ref: categoryRef, inView } = useInView({
     threshold: 1,
   });
@@ -61,42 +60,38 @@ const CategoryComponent: FC<Props> = ({
                 category === selectedProduct?.category
               ) {
                 return (
-                  <Fragment key={product._id}>
-                    <Grid container item md={4} sm={6}>
-                      <Box sx={{ width: "10em", height: "9em" }}></Box>
-                    </Grid>
-                  </Fragment>
+                  <Grid container key={product._id} item md={4} sm={6}>
+                    <Box sx={{ width: "10em", height: "9em" }}></Box>
+                  </Grid>
                 );
               }
               return (
-                <Fragment key={product._id}>
-                  <Grid
-                    container
-                    item
-                    sm={6}
-                    md={4}
-                    sx={{ position: "relative" }}
+                <Grid
+                  key={product._id}
+                  container
+                  item
+                  sm={6}
+                  md={4}
+                  sx={{ position: "relative" }}
+                >
+                  <motion.div
+                    style={{ width: "90%", height: "9em" }}
+                    initial="hidden"
+                    animate="visible"
+                    variants={variants}
+                    transition={{ duration: 0.5 }}
                   >
-                    <motion.div
-                      style={{ width: "90%", height: "9em" }}
-                      initial="hidden"
-                      animate="visible"
-                      variants={variants}
-                      transition={{ duration: 0.5 }}
-                    >
-                      <ProductTamplateComponent
-                        category={category}
-                        product={product}
-                        setSelectedProduct={setSelectedProduct}
-                      />
-                    </motion.div>
-                  </Grid>
-                </Fragment>
+                    <ProductTamplateComponent
+                      category={category}
+                      product={product}
+                      setSelectedProduct={setSelectedProduct}
+                    />
+                  </motion.div>
+                </Grid>
               );
             }
           })}
       </Grid>
-      <Divider />
     </div>
   );
 };

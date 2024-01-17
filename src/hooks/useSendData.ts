@@ -1,31 +1,34 @@
-import axios, { AxiosError } from "axios";
-import { useState } from "react";
+import axios from "axios";
 
 interface Props {
   url: string;
   data?: any;
-  method: "post" | "patch";
+  method: "post" | "patch" | "delete";
 }
 
 const sendData = async (props: Props) => {
   const { url, data, method } = props;
 
-  if (!url) return;
+  if (!url || !method) throw new Error("URL or Method not provided");
   try {
-    let res;
-    if (method === "post") {
-      res = await axios.post(url, data);
-    } else if (method === "patch") {
-      res = await axios.patch(url, data);
+    let response;
+    switch (method) {
+      case "post":
+        response = await axios.post(url, data);
+        break;
+      case "patch":
+        response = await axios.patch(url, data);
+        break;
+      case "delete":
+        response = await axios.delete(url);
+        break;
     }
-
-    if (!res) throw new Error("Unable to send data");
-    return res.data;
+    return response.data;
   } catch (error: unknown) {
     if (axios.isAxiosError(error)) {
-      return error.response?.data;
+      throw error;
     }
-    return error;
+    throw new Error("Unknown error occurred");
   }
 };
 

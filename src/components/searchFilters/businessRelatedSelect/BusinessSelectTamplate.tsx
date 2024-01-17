@@ -8,7 +8,7 @@ const BusinessSelectTamplate: FC<Props> = ({ business }) => {
   return (
     <Card sx={{ display: "flex" }}>
       <CardMedia
-        sx={{ width: "50%", mr: 1 }}
+        sx={{ width: "50%", height: "5em", mr: 1 }}
         component="img"
         src={business.businessImage.url}
         alt={business.businessImage.alt}

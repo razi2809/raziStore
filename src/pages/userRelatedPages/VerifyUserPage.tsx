@@ -35,20 +35,14 @@ const VerifyUserPage = () => {
       ...inputs,
       [e.target.id]: e.target.value,
     };
-    if (secondtrychance) {
-      //when its his second try and we gave him the warning then
-      //alert him if its still have an error or if its not
+    if (secondtrychance || e.target.id === "verificationCode") {
+      // Validate using the new inputs
       const joiResponse = validateVerify(updatedInputs);
       setErrorsState(joiResponse);
-    }
-    if (e.target.id === "verificationCode") {
-      //check if its the lest input and want to regisert
-      //sende the inpunts to the joi validate
-      //if error from joi then set them and trigerr a alert for each input
-      //if the joi dosent have value it empty so let the user hit submit
-      const joiResponse = validateVerify(updatedInputs);
-      setErrorsState(joiResponse);
-      setSeconrychance(true);
+
+      if (e.target.id === "verificationCode") {
+        setSeconrychance(true);
+      }
     }
   };
 

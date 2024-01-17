@@ -58,12 +58,12 @@ const GoogleMapToView: FC<Props> = ({ theme, address }) => {
                 function (event: google.maps.MapMouseEvent) {
                   const location = event.latLng;
                   const locationToJSON = event.latLng?.toJSON();
-                  const infoWindowContent = `  <div >
+                  const infoWindowContent = `  <div>
 
-                  <div>City: ${address.city}</div>
-                  <div>Street Name: ${address.street}</div>
+                  <div style="color:black">City: ${address.city}</div>
+                  <div style="color:black">Street Name: ${address.street}</div>
                   
-                 <div>building Number: ${address.buildingNumber}</div></div>`;
+                 <div style="color:black">building Number: ${address.buildingNumber}</div></div>`;
                   if (location && locationToJSON) {
                     infoWindowInstanceRef.current?.setContent(
                       infoWindowContent

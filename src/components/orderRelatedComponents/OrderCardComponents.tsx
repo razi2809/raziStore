@@ -1,4 +1,4 @@
-import { FC, useState } from "react";
+import { FC, memo, useState } from "react";
 import { Box, Card, CardContent, CardMedia, Typography } from "@mui/material";
 
 import { useNavigate } from "react-router-dom";
@@ -7,18 +7,18 @@ import { IOrderData } from "../../@types/order";
 interface Props {
   order: IOrderData;
 }
-const OrderHistoryComponents: FC<Props> = ({ order }) => {
+const OrderCardComponents: FC<Props> = ({ order }) => {
   const [hover, setHover] = useState(false);
   const navigate = useNavigate();
 
-  const navigetToBusiness = () => {
-    navigate(`${ROUTER.BUSINESS}/${order.business.businessId}`);
+  const navigetToOrder = () => {
+    navigate(`${ROUTER.ORDER}/${order._id}`);
   };
   return (
     <Card
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
-      onClick={navigetToBusiness}
+      onClick={navigetToOrder}
       sx={{ bgcolor: "divider" }}
       style={{
         position: "relative",
@@ -60,4 +60,4 @@ const OrderHistoryComponents: FC<Props> = ({ order }) => {
     </Card>
   );
 };
-export default OrderHistoryComponents;
+export default memo(OrderCardComponents);

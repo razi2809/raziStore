@@ -1,6 +1,6 @@
-import React, { CSSProperties, FC, useEffect, useRef, useState } from "react";
+import { FC, useEffect, useRef, useState } from "react";
 import { Loader } from "@googlemaps/js-api-loader";
-import { Box, TextField, Zoom, useTheme } from "@mui/material";
+import { Box, useTheme } from "@mui/material";
 import { ILocation } from "../../../@types/inputs";
 import { darkMapStyle, lightMapStyle } from "../../../mapStyles";
 import ReactSelect, {

@@ -21,9 +21,7 @@ const useFetch = (url: string) => {
         setData(res.data);
       } catch (err) {
         if (axios.isAxiosError(err)) {
-          // Correctly use the caught error (err) instead of the state error
-
-          setError(err);
+          setError(err.response?.data);
         } else {
           // If it's not an AxiosError, it could be an error with setting up the request
           setError(

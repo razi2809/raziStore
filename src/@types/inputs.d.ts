@@ -1,6 +1,6 @@
 import { IOpeningHours } from "./business";
 
-interface IRegiserInputs {
+export interface IRegiserInputs {
   firstName: string;
   lastName: string;
   email: string;
@@ -13,7 +13,17 @@ interface IRegiserInputs {
   url: string;
   alt: string;
 }
-interface IProductInputs {
+export interface IUpdateNameInputs {
+  firstName: string;
+  lastName: string;
+}
+export interface IUpdateEmailInput {
+  email: string;
+}
+export interface IUpdatePhoneInput {
+  phoneNumber: string;
+}
+export interface IProductInputs {
   productName: string;
   description: string;
   categoryOne: string;
@@ -25,7 +35,7 @@ interface IProductInputs {
   url: string;
   alt: string;
 }
-interface ICreatebusinessInputs {
+export interface ICreatebusinessInputs {
   businessName: string;
   email: string;
   businessPhoneNumber: string;
@@ -37,7 +47,7 @@ interface ICreatebusinessInputs {
   alt: string;
   OpeningHours: IOpeningHours;
 }
-interface IUpdateInputs {
+export interface IUpdateInputs {
   firstName: string;
   lastName: string;
   email: string;
@@ -47,42 +57,30 @@ interface IUpdateInputs {
   buildingNumber: number;
   url?: string;
 }
-interface IVerifyInputs {
+export interface IVerifyInputs {
   email: string;
   verificationCode: string;
 }
-interface ILoginInputs {
+export interface ILoginInputs {
   email: string;
   password: string;
 }
-interface ErrorObj {
+export interface ErrorObj {
   [key: string]: string;
 }
-interface ITokenPayload {
+export interface ITokenPayload {
   email: string;
   iat?: string;
   userId: TypeExpressionOperatorReturningObjectId;
 }
-interface ILocation {
+export interface ILocation {
   buildingNumber: number;
   street: string;
   city: string;
 }
-interface IResetPasswordInputs {
+export interface IResetPasswordInputs {
   email: string;
   passwordResetCode: string;
   password: string;
   passwordConfirmation: string;
 }
-export {
-  IRegiserInputs,
-  ErrorObj,
-  IVerifyInputs,
-  ILoginInputs,
-  ITokenPayload,
-  IUpdateInputs,
-  ILocation,
-  IResetPasswordInputs,
-  ICreatebusinessInputs,
-  IProductInputs,
-};

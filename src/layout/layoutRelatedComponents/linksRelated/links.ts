@@ -3,15 +3,14 @@ import { ROUTER } from "../../../Router/ROUTER";
 export const links = {
   alwaysLinks: [],
   loggedinLinks: [
-    { to: ROUTER.HOME, children: "Home page" },
+    { to: ROUTER.HOME, children: "Home page", key: 1 },
     //   { to: `${ROUTER.CARDS}/favorite`, children: "favorite" },
   ],
   loggedoutLinks: [
-    { to: ROUTER.HOME, children: "Home page" },
-
-    { to: ROUTER.REGISTER, children: "Register page" },
-    { to: ROUTER.LOGIN, children: "Login page" },
-    { to: ROUTER.PASSWORDRESET, children: "reset password" },
+    { to: ROUTER.HOME, children: "Home page", key: 2 },
+    { to: ROUTER.REGISTER, children: "Register page", key: 3 },
+    { to: ROUTER.LOGIN, children: "Login page", key: 4 },
+    { to: ROUTER.PASSWORDRESET, children: "reset password", key: 5 },
   ],
   businessType: [
     //   {
@@ -20,6 +19,11 @@ export const links = {
     //   },
   ],
   adminType: [
-    { to: `${ROUTER.BUSINESS}/newBusiness`, children: "create business" },
+    {
+      to: `${ROUTER.BUSINESS}/newBusiness`,
+      children: "create business",
+      key: 6,
+    },
+    { to: `${ROUTER.CRM}`, children: "crm system", key: 7 },
   ],
 };

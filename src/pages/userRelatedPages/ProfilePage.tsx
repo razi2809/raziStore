@@ -1,5 +1,5 @@
 import { Box, Grid, Typography } from "@mui/material";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Link, useLocation, useParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import PersonalInfo from "../../components/userRelatedComponents/PersonalInfo";
@@ -8,8 +8,10 @@ import { Iuser } from "../../@types/user";
 import LoaderComponent from "../../layout/layoutRelatedComponents/LoaderComponent";
 import { IBusiness } from "../../@types/business";
 import { IOrderData } from "../../@types/order";
-import OrderHistoryInfo from "../../components/userRelatedComponents/OrderHistoryInfo";
+import OrderHistoryInfo from "../../components/orderRelatedComponents/OrdersInfo";
 import AddressInfo from "../../components/userRelatedComponents/AddressInfo";
+import notify from "../../services/toastService";
+import UserSettings from "../../components/userRelatedComponents/UserSettings";
 // Define the possible categories for the profile page.
 
 type Categories =
@@ -23,6 +25,7 @@ const categories: Categories[] = [
   "my-address",
   "settings",
 ];
+
 const ProfilePage = () => {
   const location = useLocation();
   const [activeSection, setActiveSection] = useState<Categories>(
@@ -67,23 +70,26 @@ const ProfilePage = () => {
     // Check for each specific error and add an appropriate message to the array.
     if (userError) {
       errors.push("An error occurred while fetching user data.");
+      notify.error(userError.message);
+
       setUserData(null);
     } else {
       setUserData(user?.user);
     }
     if (likedPlacesError) {
       errors.push("An error occurred while fetching liked places.");
+      notify.info(likedPlacesError.message);
       setUserLikedPlaces(null);
     } else {
       setUserLikedPlaces(likedPlaces?.likedPlaces);
     }
     if (orderHistoryError) {
       errors.push("An error occurred while fetching order history.");
+      notify.info(orderHistoryError.message);
       setUserOrderHistory(null);
     } else {
       setUserOrderHistory(orderHistory?.orderHistory);
     }
-
     // If there are any errors, update the errorMessages state.
     if (errors.length > 0) {
       setErrorState(errors);
@@ -99,6 +105,45 @@ const ProfilePage = () => {
     likedPlaces,
   ]);
 
+  const addTemporarilyUserDataChange = useCallback(
+    (
+      whatChange: "name" | "email" | "PhoneNumber" | "businessName",
+      data: any
+    ) => {
+      if (!userData) return;
+      switch (whatChange) {
+        case "name":
+          setUserData((prevUserData) => {
+            if (!prevUserData) return null;
+            return {
+              ...prevUserData,
+              name: data.name,
+            };
+          });
+
+          break;
+        case "email":
+          setUserData((prevUserData) => {
+            if (!prevUserData) return null;
+            return {
+              ...prevUserData,
+              email: data.email,
+            };
+          });
+          break;
+        case "PhoneNumber":
+          setUserData((prevUserData) => {
+            if (!prevUserData) return null;
+            return {
+              ...prevUserData,
+              phoneNumber: data.phoneNumber,
+            };
+          });
+          break;
+      }
+    },
+    [userData]
+  );
   if (userData) {
     return (
       <Grid>
@@ -122,14 +167,13 @@ const ProfilePage = () => {
             bgcolor: "secondary.main",
             p: 2,
             position: "sticky",
-            top: "7vh",
+            top: "4em",
             zIndex: 3,
           }}
         >
           {" "}
           <Box
             sx={{
-              ml: 4,
               display: "flex",
               flexWrap: "wrap",
             }}
@@ -207,9 +251,17 @@ const ProfilePage = () => {
           />
         )}
         {activeSection === "order-history" && userOrderHistory && (
-          <OrderHistoryInfo orderHistory={userOrderHistory} />
+          <OrderHistoryInfo orders={userOrderHistory} />
         )}
-        {activeSection === "my-address" && <AddressInfo />}
+        {activeSection === "my-address" && (
+          <AddressInfo askedUserAddresses={userData.address} />
+        )}
+        {activeSection === "settings" && (
+          <UserSettings
+            user={userData}
+            updateUser={addTemporarilyUserDataChange}
+          />
+        )}
       </Grid>
     );
   }

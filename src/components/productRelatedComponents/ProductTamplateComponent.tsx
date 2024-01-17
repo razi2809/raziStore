@@ -1,19 +1,30 @@
-import React, { Dispatch, FC, SetStateAction, memo, useState } from "react";
+import React, { FC, memo, useState } from "react";
 import { IProduct } from "../../@types/product";
-import { Box, Card, CardMedia, Checkbox, Typography } from "@mui/material";
-import { motion } from "framer-motion";
+import {
+  Box,
+  Card,
+  CardMedia,
+  Checkbox,
+  IconButton,
+  Tooltip,
+  Typography,
+} from "@mui/material";
 import { ISelected } from "../../pages/businessRelatedPages/BusinessPage";
-import axios from "axios";
+import { AxiosError } from "axios";
 import { useAppSelector } from "../../REDUX/bigPie";
-import ShareIcon from "@mui/icons-material/Share";
+import ShareOutlinedIcon from "@mui/icons-material/ShareOutlined";
+import EditIcon from "@mui/icons-material/Edit";
 import { Favorite, FavoriteBorder } from "@mui/icons-material";
 import { ROUTER } from "../../Router/ROUTER";
 import sendData from "../../hooks/useSendData";
+import notify from "../../services/toastService";
+import { useNavigate } from "react-router-dom";
 interface Props {
   product: IProduct;
-  setSelectedProduct: React.Dispatch<React.SetStateAction<ISelected | null>>;
-  category: string;
-  // setProductLike: (like: boolean, productId: string) => void;
+  setSelectedProduct: React.Dispatch<
+    React.SetStateAction<ISelected | null>
+  > | null;
+  category: string | null;
 }
 const ProductTamplateComponent: FC<Props> = ({
   product,
@@ -23,18 +34,26 @@ const ProductTamplateComponent: FC<Props> = ({
   const user = useAppSelector((bigPie) => bigPie.authReducer);
   const [like, setLike] = useState(product.likes.includes(user.user?._id));
   const [hover, setHover] = useState(false);
-
+  const navigate = useNavigate();
   const handleProductLike = async (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>
   ) => {
     e.stopPropagation();
 
     try {
+      const res = await sendData({
+        url: `/product/${product._id}`,
+        method: "patch",
+      });
       setLike(!like);
-      await sendData({ url: `/product/${product._id}`, method: "patch" });
       setProductLike(!like, product._id);
+      notify.success(res.message);
     } catch (e) {
-      console.log(e);
+      if (e instanceof AxiosError) {
+        notify.error(e.response?.data.message);
+      } else {
+        notify.error("An unknown error occurred");
+      }
     }
   };
   const setProductLike = (like: boolean, productId: string) => {
@@ -58,14 +77,22 @@ const ProductTamplateComponent: FC<Props> = ({
       navigator.share({
         title: `${product.productName}`,
         text: "Check out my awesome business",
-        url: ` https://raziStore${ROUTER.BUSINESS}/${product.businessId}?item=${product._id}&category=${category}.com`,
+        url: `https://razi2809.github.io/raziStore${ROUTER.BUSINESS}/${product.businessId}?item=${product._id}&category=${category}`,
       });
     } else {
-      console.log("Web Share API is not supported in your browser");
+      notify.error("Web Share API is not supported in your browser");
     }
   };
-  const label = { inputProps: { "aria-label": "Checkbox demo" } };
-
+  const handleEdit = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    e.stopPropagation();
+    navigate(`${ROUTER.PRODUCTS}/${product._id}`);
+  };
+  const isProductAvailable = product.productQuantity !== 0;
+  const handleProductSelection = () => {
+    if (isProductAvailable && setSelectedProduct) {
+      setSelectedProduct({ productId: product._id, category });
+    }
+  };
   return (
     <Card
       sx={{
@@ -82,11 +109,7 @@ const ProductTamplateComponent: FC<Props> = ({
       }}
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
-      onClick={() =>
-        product.productQuantity !== 0
-          ? setSelectedProduct({ productId: product._id, category: category })
-          : null
-      }
+      onClick={handleProductSelection}
     >
       <Box sx={{ display: "flex", width: "100%", height: "100%" }}>
         <Box
@@ -127,20 +150,32 @@ const ProductTamplateComponent: FC<Props> = ({
       </Box>
       <div style={{ position: "absolute", top: 0, left: 0, zIndex: 2 }}>
         {user && user.isLoggedIn && (
-          <Checkbox
-            {...label}
-            checked={like}
-            onClick={(e) => handleProductLike(e)}
-            icon={<FavoriteBorder />}
-            checkedIcon={<Favorite />}
-          />
+          <>
+            <Tooltip title="like">
+              <Checkbox
+                inputProps={{
+                  "aria-label": "like",
+                }}
+                checked={like}
+                onClick={(e) => handleProductLike(e)}
+                icon={<FavoriteBorder />}
+                checkedIcon={<Favorite />}
+              />
+            </Tooltip>
+            {user.user?.isBusiness && (
+              <Tooltip title="edit">
+                <IconButton onClick={(e) => handleEdit(e)}>
+                  <EditIcon />{" "}
+                </IconButton>
+              </Tooltip>
+            )}
+          </>
         )}
-        <Checkbox
-          {...label}
-          onClick={(e) => handleShare(e)}
-          icon={<ShareIcon />}
-          checkedIcon={<ShareIcon />}
-        />{" "}
+        <Tooltip title="share">
+          <IconButton onClick={(e) => handleShare(e)}>
+            <ShareOutlinedIcon />{" "}
+          </IconButton>
+        </Tooltip>
       </div>
       {product.productQuantity === 0 && (
         <span

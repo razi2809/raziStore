@@ -18,6 +18,8 @@ import { normalRegister } from "../../normalizedData/userTypesData/registerForma
 import { useNavigate } from "react-router-dom";
 import GoogleMapToEdit from "../../layout/layoutRelatedComponents/maps/GoogleMapEdit";
 import sendData from "../../hooks/useSendData";
+import notify from "../../services/toastService";
+import { AxiosError } from "axios";
 const defaultAvatarUrl =
   "https://firebasestorage.googleapis.com/v0/b/social-media-27267.appspot.com/o/images%2FavatarDefaulPic.png?alt=media&token=1ca6c08e-505f-465b-bcd9-3d47c9b1c28f";
 const RegisterPage = () => {
@@ -68,20 +70,14 @@ const RegisterPage = () => {
       ...inputs,
       [e.target.id]: e.target.value,
     };
-    if (secondtrychance) {
-      //when its his second try and we gave him the warning then
-      //alert him if its still have an error or if its not
+    if (secondtrychance || e.target.id === "passwordConfirmation") {
+      // Validate using the new inputs
       const joiResponse = validateRegister(updatedInputs);
       setErrorsState(joiResponse);
-    }
-    if (e.target.id === "passwordConfirmation") {
-      //check if its the lest input and want to regisert
-      //sende the inpunts to the joi validate
-      //if error from joi then set them and trigerr a alert for each input
-      //if the joi dosent have value it empty so let the user hit submit
-      const joiResponse = validateRegister(updatedInputs);
-      setErrorsState(joiResponse);
-      setSeconrychance(true);
+
+      if (e.target.id === "passwordConfirmation") {
+        setSeconrychance(true);
+      }
     }
   };
   const handleLocationChange = (location: ILocation) => {
@@ -133,11 +129,21 @@ const RegisterPage = () => {
     inputs.buildingNumber = Number(inputs.buildingNumber);
     try {
       const data = normalRegister(inputs);
-      await sendData({ url: "/users/register", data: data, method: "post" });
+      const res = await sendData({
+        url: "/users/register",
+        data: data,
+        method: "post",
+      });
       //user created go to verifiey it
+      notify.success(res.message);
+
       navigate(`/verify/${inputs.email}`);
     } catch (e) {
-      // the request failed(not from server)
+      if (e instanceof AxiosError) {
+        notify.error(e.response?.data.message);
+      } else {
+        notify.error("An unknown error occurred");
+      }
     }
   };
   return (

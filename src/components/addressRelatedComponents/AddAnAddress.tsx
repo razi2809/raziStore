@@ -1,4 +1,4 @@
-import React, { FC, useState } from "react";
+import React, { useState } from "react";
 import {
   Box,
   Button,
@@ -11,20 +11,13 @@ import {
 import { useAppDispatch, useAppSelector } from "../../REDUX/bigPie";
 import ClearIcon from "@mui/icons-material/Clear";
 import sendData from "../../hooks/useSendData";
-import animationData from "../../svg/locationSvg.json";
-import Lottie from "react-lottie";
 import GoogleMapToEdit from "../../layout/layoutRelatedComponents/maps/GoogleMapEdit";
 import { ILocation } from "../../@types/inputs";
 import { addAdressNormalized } from "../../normalizedData/userTypesData/addAddress";
 import { authActions } from "../../REDUX/authSlice";
-const defaultOptions = {
-  loop: true,
-  autoplay: true,
-  animationData: animationData,
-  rendererSettings: {
-    preserveAspectRatio: "xMidYMid slice",
-  },
-};
+import { AxiosError } from "axios";
+import notify from "../../services/toastService";
+
 const AddAnAddress = () => {
   const dispatch = useAppDispatch();
   const user = useAppSelector((bigPie) => bigPie.authReducer);
@@ -51,9 +44,15 @@ const AddAnAddress = () => {
         ...data.address,
         id: 1,
       };
-      dispatch(authActions.addTemoprarlyAddress(temoprarlyAddress));
-    } catch (err) {
-      console.log(err);
+
+      notify.success(res.message);
+      dispatch(authActions.addTemperarlyAddress(temoprarlyAddress));
+    } catch (e) {
+      if (e instanceof AxiosError) {
+        notify.error(e.response?.data.message);
+      } else {
+        notify.error("An unknown error occurred");
+      }
     }
   };
   return (
@@ -63,7 +62,7 @@ const AddAnAddress = () => {
           width: "30em",
           display: "flex",
           flexDirection: "column",
-          zIndex: 2000, // Add this line
+          zIndex: 2000,
           position: "relative",
         }}
         onClick={handleClick}
@@ -81,11 +80,9 @@ const AddAnAddress = () => {
         </Box>
         <CardContent
           sx={{
-            bgcolor: "secondary.main",
             flexGrow: 1,
             display: "flex",
             flexDirection: "column",
-            // mt: 2,
             p: 3,
           }}
           onClick={handleClick}
@@ -110,20 +107,21 @@ const AddAnAddress = () => {
               onChange={(e) => setAddressName(e.target.value)}
               sx={{ mb: 1 }}
             />
-            <GoogleMapToEdit
-              theme={user.user ? user.user?.theme : "light"}
-              getLocation={locationChange}
-            />
-            <Lottie options={defaultOptions} height={400} width={400} />
-            <Typography variant="h5" sx={{ textAlign: "start", b: 3 }}>
-              {/* {product.description} */}
-            </Typography>
+            <Box sx={{ height: "20em" }}>
+              <GoogleMapToEdit
+                theme={user.user ? user.user?.theme : "light"}
+                getLocation={locationChange}
+              />
+            </Box>
+            <Typography
+              variant="h5"
+              sx={{ textAlign: "start", b: 3 }}
+            ></Typography>
           </Box>{" "}
           <Box
             sx={{
               justifyContent: "center",
               display: "flex",
-              // height: "70%",
               mt: 1,
             }}
           >
@@ -140,7 +138,7 @@ const AddAnAddress = () => {
               }}
               onClick={() => addAddress()}
             >
-              <Box sx={{ flexGrow: 1 }}>Add to Cart</Box>
+              <Box sx={{ flexGrow: 1 }}>Add address</Box>
             </Button>
           </Box>
         </CardContent>

@@ -24,11 +24,15 @@ import { IOpeningHours } from "../../@types/business";
 import { validateRegisterBusiness } from "../../validation/validationSchema/businessScema/createBusinessScema";
 import { normalCreateBusiness } from "../../normalizedData/businessTypesData/CreateBusiness";
 import OpeningHoursToEdit from "../../components/businessRelatedComponents/OpeningHoursToEdit";
+import UploadPicComponent from "../../components/genericComponents/UploadPicComponent";
+import { ROUTER } from "../../Router/ROUTER";
+import notify from "../../services/toastService";
+import { AxiosError } from "axios";
 const defaultAvatarUrl =
-  "https://firebasestorage.googleapis.com/v0/b/social-media-27267.appspot.com/o/images%2FavatarDefaulPic.png?alt=media&token=1ca6c08e-505f-465b-bcd9-3d47c9b1c28f";
+  "https://img.freepik.com/premium-vector/abstract-logo-company-made-with-color_341269-925.jpg";
 const CreateBusiness = () => {
   const navigate = useNavigate();
-  const [openingHours, SetOpeningHours] = useState<IOpeningHours>({
+  const openingHours = {
     Sunday: {
       opening: "00:00",
       closing: "00:00",
@@ -64,7 +68,7 @@ const CreateBusiness = () => {
       closing: "00:00",
       close: false,
     },
-  });
+  };
   const [inputs, setInputs] = useState<ICreatebusinessInputs>({
     businessName: "",
     email: "",
@@ -88,10 +92,9 @@ const CreateBusiness = () => {
   const [didHeEditTimes, SetDidHeEditTimes] = useState(false);
   const [img, setImg] = useState<null | File>(null);
   const [secondtrychance, setSeconrychance] = useState(false);
-  const handleSetPic = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const inputElement = e.target as HTMLInputElement;
-    if (inputElement.files) {
-      setImg(inputElement.files[0]);
+  const handleSetPic = (file: File) => {
+    if (file) {
+      setImg(file);
     } else {
       setImg(null);
     }
@@ -108,20 +111,15 @@ const CreateBusiness = () => {
       ...inputs,
       [e.target.id]: e.target.value,
     };
-    if (secondtrychance) {
-      //when its his second try and we gave him the warning then
-      //alert him if its still have an error or if its not
+
+    if (secondtrychance || e.target.id === "businessDescription") {
+      // Validate using the new inputs
       const joiResponse = validateRegisterBusiness(updatedInputs);
       setErrorsState(joiResponse);
-    }
-    if (e.target.id === "businessDescription") {
-      //check if its the lest input and want to regisert
-      //sende the inpunts to the joi validate
-      //if error from joi then set them and trigerr a alert for each input
-      //if the joi dosent have value it empty so let the user hit submit
-      const joiResponse = validateRegisterBusiness(updatedInputs);
-      setErrorsState(joiResponse);
-      setSeconrychance(true);
+
+      if (e.target.id === "businessDescription") {
+        setSeconrychance(true);
+      }
     }
   };
   const getTimes = (openingHours: IOpeningHours) => {
@@ -185,12 +183,14 @@ const CreateBusiness = () => {
         data: data,
         method: "post",
       });
-      //user created go to verifiey it
-      console.log(res);
-
-      // navigate(`/verify/${inputs.email}`);
+      notify.success(res.message);
+      navigate(`${ROUTER.HOME}}`);
     } catch (e) {
-      // the request failed(not from server)
+      if (e instanceof AxiosError) {
+        notify.error(e.message);
+      } else {
+        notify.error("An unknown error occurred");
+      }
     }
   };
   return (
@@ -336,25 +336,21 @@ const CreateBusiness = () => {
                 >
                   business pic:
                 </Typography>
-                <label htmlFor="file-input">
-                  <Card sx={{ width: "100%", height: "10em" }}>
-                    <CardMedia
-                      sx={{ height: "200px" }}
-                      component="img"
-                      alt="business pic"
-                      src={img ? URL.createObjectURL(img) : defaultAvatarUrl}
-                    />
-                  </Card>
 
-                  <input
-                    id="file-input"
-                    style={{ display: "none" }}
-                    className="file-input"
-                    type="file"
-                    accept="image/*"
-                    onChange={(e) => handleSetPic(e)}
-                  />
-                </label>{" "}
+                <Box sx={{ width: "100%", height: "10em", mb: 1 }}>
+                  {!img && <UploadPicComponent onFileSelect={handleSetPic} />}
+                  {img && (
+                    <Card sx={{ width: "100%", height: "10em" }}>
+                      <CardMedia
+                        sx={{ height: "200px" }}
+                        component="img"
+                        alt="business pic"
+                        src={URL.createObjectURL(img)}
+                      />
+                    </Card>
+                  )}
+                </Box>
+
                 <Box sx={{ width: "100%", height: "3em" }}>
                   <TextField
                     id="alt"
@@ -443,7 +439,7 @@ const CreateBusiness = () => {
               }
               variant="contained"
             >
-              regiser{" "}
+              create new business
             </Button>
           </Grid>{" "}
           <Grid container item md={2} sm={1} xs={1}>

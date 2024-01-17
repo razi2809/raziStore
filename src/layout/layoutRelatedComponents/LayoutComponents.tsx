@@ -11,9 +11,9 @@ import { grey } from "@mui/material/colors";
 import MainComponent from "./MainComponent";
 import useAutoLogin from "../../hooks/useAutoLogin";
 import { useAppSelector } from "../../REDUX/bigPie";
-import { Iuser } from "../../@types/user";
 import LoaderComponent from "./LoaderComponent";
 import Header from "../headerRelatedComponent/Header";
+import notify from "../../services/toastService";
 type Props = {
   children: React.ReactNode;
 };
@@ -65,37 +65,34 @@ const lightModeTheme = createTheme(getDesignTokens("light"));
 
 const LayoutComponents: FC<Props> = ({ children }) => {
   const user = useAppSelector((bigPie) => bigPie.authReducer);
-  // const [user, setUser] = useState<Iuser | null>(null);
   const [done, setDone] = useState(false);
   const login = useAutoLogin();
 
   useEffect(() => {
-    (async () => {
+    const userLogin = async () => {
       try {
         const userdata = await login();
-        if (userdata != null) {
-          if (!userdata.authorized) {
-            // ErrorMessage(userdata.err);
-            console.log(userdata);
-          } else {
-            // setUserData(userdata);
-            // if ("user" in userdata) setUser(userdata.user);
-          }
+        if (!userdata) {
+          //when user data is null means there are no token find in login function so dont show the user nothing
+          return;
         }
-        //when user data is null means there are no token find in login function so dont show the user nothing
-        //when user data is unauthorized toast the error(server error)
-        //when user data is neither that means that login was success so dont show the user nothing
+        if ("err" in userdata) {
+          if (userdata.err !== undefined) notify.error(userdata.err);
+          return;
+        }
+        // Success case
+        const welcomeMessage = userdata.local
+          ? `welcome back ${userdata.user.name.firstName}`
+          : `welcome ${userdata.user.name.firstName}`;
+        notify.success(welcomeMessage);
       } catch (err) {
-        console.log(err);
-
-        // ErrorMessage(err);
-        // code to run when the useEffect failed
-        //send a tost with the error message
+        notify.error("an error has occurred");
       } finally {
         setDone(true);
         //set done to true which means that he done checking regardless of the result
       }
-    })();
+    };
+    userLogin();
   }, []);
   if (done) {
     return (
@@ -122,7 +119,7 @@ const LayoutComponents: FC<Props> = ({ children }) => {
             <Box sx={{ zIndex: 99, position: "absolute" }}>
               <Header />
             </Box>
-            <Box sx={{ mt: "7vh" }}>
+            <Box sx={{ mt: "4em" }}>
               <MainComponent>{children}</MainComponent>
             </Box>
           </Box>

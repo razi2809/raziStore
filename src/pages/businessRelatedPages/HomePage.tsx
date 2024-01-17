@@ -10,7 +10,7 @@ import { useAppSelector } from "../../REDUX/bigPie";
 import AllBusinessContainer from "../../components/businessRelatedComponents/AllBusinessContainer";
 import OpenBusinessContainer from "../../components/businessRelatedComponents/OpenBusinessContainer";
 import FavoriteBusinessContainer from "../../components/businessRelatedComponents/FavoriteBusinessContainer";
-import SelectFilterBusiness from "../../components/searchFilters/businessRelatedSelect/SelectFilterBusiness";
+import notify from "../../services/toastService";
 // Define the sections that can be displayed on the home page.
 
 const sectionOptions: Section[] = [
@@ -35,9 +35,8 @@ const HomePage = () => {
   useEffect(() => {
     // Check if there's an error after fetching data.
     if (error) {
-      // logging the error, or showing a toast notification to the user.
-      console.error("An error occurred while fetching businesses:", error);
-      // Optionally, you can set a state here to show an error message in the UI.
+      //  showing a toast notification to the user.
+      notify.error(error.message);
     } else if (data && data.businesses) {
       // If there's no error and data is present, update the businesses state.
       setBusinesses(data.businesses);
@@ -53,17 +52,17 @@ const HomePage = () => {
     );
   }, [hashValue]);
 
-  const handleTemporarlyBusinessLike = (like: boolean, business: IBusiness) => {
+  const handleTemporarlyBusinessLike = (like: boolean, businessId: string) => {
     // handle temporary likes on businesses, updating the state on the whole data.
     // Check if the user is logged in and if the business object is valid
-    if (!user.isLoggedIn || !business) {
+    if (!user.isLoggedIn || !businessId) {
       return;
     }
 
     // Create a new array of businesses with the updated likes
     const updatedBusinesses = businesses.map((b) => {
       // Check if the current business is the one being updated
-      if (b._id === business._id) {
+      if (b._id === businessId) {
         // Return a new business object with the updated likes array
         return {
           ...b,

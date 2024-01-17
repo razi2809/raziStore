@@ -2,10 +2,15 @@ import { useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../REDUX/bigPie";
 import { useNavigate, useParams } from "react-router-dom";
 import LoaderComponent from "../../layout/layoutRelatedComponents/LoaderComponent";
-import { Box, Button, Grid, Typography } from "@mui/material";
-import Select, { SingleValue } from "react-select";
+import { Box, Button, Grid, Typography, useTheme } from "@mui/material";
+import ReactSelect, {
+  StylesConfig,
+  ControlProps,
+  CSSObjectWithLabel,
+  OptionProps,
+  SingleValue,
+} from "react-select";
 import { motion } from "framer-motion";
-
 import GoogleMaps2markers from "../../layout/layoutRelatedComponents/maps/GoogleMaps2markers";
 import ProductOrderTamplate from "../../components/productRelatedComponents/ProductOrderTamplate";
 import { ILocation } from "../../@types/inputs";
@@ -13,18 +18,50 @@ import GoogleMapToView from "../../layout/layoutRelatedComponents/maps/GoogleMap
 import { orderActions } from "../../REDUX/orderSlice";
 import { ROUTER } from "../../Router/ROUTER";
 import { orderNormalized } from "../../normalizedData/userTypesData/createOrderNormalized";
-
 import sendData from "../../hooks/useSendData";
 import { IAddress } from "../../@types/user";
 import AddAnAddress from "../../components/addressRelatedComponents/AddAnAddress";
+import { AxiosError } from "axios";
+import notify from "../../services/toastService";
 const PlaceAnOrdePage = () => {
+  const pageTheme = useTheme();
+
+  const selectStyles: StylesConfig<{ value: IAddress; label: string }, false> =
+    {
+      control: (
+        base: CSSObjectWithLabel,
+        props: ControlProps<{ value: IAddress; label: string }, false>
+      ) => ({
+        ...base,
+        backgroundColor: pageTheme.palette.background.paper,
+        color: pageTheme.palette.text.primary,
+        borderColor: pageTheme.palette.divider,
+        // Add other custom styles or overrides
+      }),
+      menu: (base: CSSObjectWithLabel) => ({
+        ...base,
+        backgroundColor: pageTheme.palette.background.paper,
+        // Add other custom styles or overrides
+      }),
+      option: (
+        base: CSSObjectWithLabel,
+        props: OptionProps<{ value: IAddress; label: string }, false>
+      ) => ({
+        ...base,
+        backgroundColor: props.isFocused
+          ? pageTheme.palette.action.hover
+          : base.backgroundColor,
+        color: props.isFocused ? pageTheme.palette.text.primary : base.color,
+        // Add other custom styles or overrides for options
+      }),
+      // Define other style overrides as needed
+    };
   const orders = useAppSelector((bigPie) => bigPie.orderReducer);
   const user = useAppSelector((bigPie) => bigPie.authReducer.user);
   const { BusinessId } = useParams();
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const order = orders.find((o) => o.business?._id === BusinessId);
-  // const [addressEdit, setAddressEdit] = useState(false);
   const [clientLocation, setClientLocation] = useState<ILocation>(
     user?.address![0]!
   );
@@ -45,8 +82,15 @@ const PlaceAnOrdePage = () => {
       });
       handleRemoveOrder();
       navigate(`${ROUTER.ORDER}/${res.orderId}`);
-    } catch (error) {
-      console.log(error);
+      notify.success(res.message);
+    } catch (e) {
+      console.log(e);
+
+      if (e instanceof AxiosError) {
+        notify.error(e.response?.data.message);
+      } else {
+        notify.error("An unknown error occurred");
+      }
     }
   };
 
@@ -138,7 +182,8 @@ const PlaceAnOrdePage = () => {
                 <Box sx={{ display: "flex" }}>
                   <Box sx={{ flexGrow: 1, pr: 1 }}>
                     {options && (
-                      <Select
+                      <ReactSelect
+                        styles={selectStyles}
                         options={options}
                         closeMenuOnSelect={true}
                         onChange={(selectedOption) =>
