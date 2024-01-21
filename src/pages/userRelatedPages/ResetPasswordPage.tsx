@@ -133,7 +133,7 @@ const ResetPasswordPage = () => {
         component="form"
         noValidate
         onSubmit={(e) => handleRequest(e)}
-        sx={{ p: 20 }}
+        sx={{ pt: 8 }}
       >
         <Grid container sx={{ mt: 0 }}>
           <Grid container item md={2} sm={2} xs={1}></Grid>
@@ -150,7 +150,7 @@ const ResetPasswordPage = () => {
               boxShadow: 3,
               borderRadius: 2,
               py: 4,
-              px: { xs: 5, sm: 4, md: 8 },
+              px: { xs: 1, sm: 4, md: 8 },
             }}
           >
             {" "}
@@ -183,9 +183,24 @@ const ResetPasswordPage = () => {
               </Typography>
             </Grid>
             <Box
-              sx={{ display: "flex", justifyContent: "center", width: "100%" }}
+              sx={{
+                display: "flex",
+                justifyContent: "center",
+                width: "100%",
+                flexWrap: "wrap",
+              }}
             >
-              <Stepper nonLinear activeStep={activeStep} sx={{ mb: 1 }}>
+              <Stepper
+                nonLinear
+                activeStep={activeStep}
+                sx={{
+                  mb: 1,
+                  display: "flex",
+                  justifyContent: "center",
+                  width: "100%",
+                  flexWrap: "wrap",
+                }}
+              >
                 {steps.map((label, index) => (
                   <Step key={label} completed={completed[index]}>
                     <StepButton disabled color="inherit">
@@ -401,7 +416,6 @@ const ResetPasswordPage = () => {
             <Grid
               container
               item
-              spacing={2}
               xs={12}
               sm={12}
               md={12}
@@ -419,7 +433,7 @@ const ResetPasswordPage = () => {
                 ? false
                 : true) && (
                 <Typography variant="body2" sx={{ color: "red" }}>
-                  * if you dont fill up the inputs you cant reset the password
+                  * if you dont fill up the inputs you cant log in
                 </Typography>
               )}
             </Grid>
