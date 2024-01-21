@@ -20,6 +20,7 @@ import BusinessGuard from "../Guards/BusinessGuard";
 import CRMPage from "../pages/userRelatedPages/CRMPage";
 import BusinessDetails from "../pages/businessRelatedPages/BusinessDetails";
 import UnVerifyGuard from "../Guards/UnVerifyGuard";
+import ProductDetails from "../pages/productRelatedPages/ProductDetails";
 
 const Router = () => {
   return (
@@ -50,22 +51,30 @@ const Router = () => {
           </AuthPrevent>
         }
       />
-      <Route
-        path={`${ROUTER.VERIFY}/:email`}
-        element={
-          <UnVerifyGuard>
-            <VerifyUserPage />
-          </UnVerifyGuard>
-        }
-      />
-      <Route
-        path={`${ROUTER.PROFILE}/:userId`}
-        element={
-          <AuthGuard>
-            <ProfilePage />
-          </AuthGuard>
-        }
-      />
+      <Route path={`${ROUTER.VERIFY}`}>
+        <Route index element={<Directing />} />
+
+        <Route
+          path={`${ROUTER.VERIFY}/:email`}
+          element={
+            <UnVerifyGuard>
+              <VerifyUserPage />
+            </UnVerifyGuard>
+          }
+        />
+      </Route>
+      <Route path={`${ROUTER.PROFILE}`}>
+        <Route index element={<Directing />} />
+
+        <Route
+          path={`${ROUTER.PROFILE}/:userId`}
+          element={
+            <AuthGuard>
+              <ProfilePage />
+            </AuthGuard>
+          }
+        />
+      </Route>
       <Route
         path={`${ROUTER.CRM}`}
         element={
@@ -130,6 +139,20 @@ const Router = () => {
           element={
             <AuthGuard>
               <OrderViewPage />
+            </AuthGuard>
+          }
+        />
+      </Route>
+      <Route path={`${ROUTER.PRODUCT}`}>
+        <Route index element={<Directing />} />
+
+        <Route
+          path={`${ROUTER.PRODUCT}/:productId`}
+          element={
+            <AuthGuard>
+              <BusinessGuard>
+                <ProductDetails />
+              </BusinessGuard>
             </AuthGuard>
           }
         />

@@ -1,6 +1,6 @@
 import Joi from "joi";
 
-import { IUpdateNameInputs } from "../../../@types/inputs";
+import { IUpdateNameInputs } from "../../../@types/generic";
 import validation from "../../validation";
 
 const nameChangeSchema = Joi.object<IUpdateNameInputs>({

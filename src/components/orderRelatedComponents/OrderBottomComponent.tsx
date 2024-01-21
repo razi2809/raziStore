@@ -1,10 +1,9 @@
-import { Box, Card, CardMedia, Typography } from "@mui/material";
-import React, { FC, useState } from "react";
+import { Box, Typography } from "@mui/material";
+import { useState } from "react";
 import { useAppSelector } from "../../REDUX/bigPie";
-import BusinessOrderTamplate from "../../components/businessRelatedComponents/BusinessOrderTamplate";
-import { useLocation } from "react-router-dom";
+import BusinessOrderTamplate from "../businessRelatedComponents/BusinessOrderTamplate";
 
-const OrderComponents = () => {
+const OrderBottomComponent = () => {
   const orders = useAppSelector((bigPie) => bigPie.orderReducer);
   const [hover, setHover] = useState(false);
 
@@ -18,7 +17,7 @@ const OrderComponents = () => {
         borderRadius: 1,
         position: "relative",
         zIndex: 1000,
-        width: "80%",
+        width: "70%",
         display: "flex",
         justifyContent: "space-around",
       }}
@@ -40,12 +39,12 @@ const OrderComponents = () => {
       {hover && (
         <Box
           sx={{
-            bgcolor: "secondary.main",
+            // bgcolor: "secondary.main",
             p: 2,
             borderRadius: 1,
             position: "absolute",
             right: 0,
-            top: 50,
+            bottom: 50,
             left: 0,
           }}
         >
@@ -56,6 +55,7 @@ const OrderComponents = () => {
                 key={order.business._id}
                 order={order}
                 ordersHover={setHover}
+                canHover={false}
               />
             );
           })}
@@ -65,4 +65,4 @@ const OrderComponents = () => {
   );
 };
 
-export default OrderComponents;
+export default OrderBottomComponent;

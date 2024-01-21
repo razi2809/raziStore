@@ -1,6 +1,6 @@
 import Joi from "joi";
 import validation from "../../validation";
-import { IProductInputs } from "../../../@types/inputs";
+import { IProductInputs } from "../../../@types/generic";
 const createBusinessScema = Joi.object<IProductInputs>({
   productName: Joi.string().min(2).max(25).required().messages({
     "string.empty": "businessName cannot be empty",

@@ -1,6 +1,6 @@
 import Joi from "joi";
 
-import { IUpdateEmailInput } from "../../../@types/inputs";
+import { IUpdateEmailInput } from "../../../@types/generic";
 import validation from "../../validation";
 
 const emailChangeSchema = Joi.object<IUpdateEmailInput>({

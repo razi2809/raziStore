@@ -34,13 +34,15 @@ const UploadPicComponent: FC<Props> = ({ onFileSelect }) => {
       onFileSelect(e.target.files[0]);
     }
   };
-  const handleClick = () => {
+  const handleClick = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+    e.stopPropagation();
     if (fileInputRef.current) {
       fileInputRef.current.click();
     }
   };
   return (
     <Box
+      onClick={(e) => handleClick(e)}
       sx={{
         width: "100%",
         height: "100%",
@@ -64,7 +66,6 @@ const UploadPicComponent: FC<Props> = ({ onFileSelect }) => {
       onDragOver={handleDrag}
       onDragLeave={handleDrag}
       onDrop={handleDrop}
-      onClick={handleClick}
     >
       <input
         ref={fileInputRef}

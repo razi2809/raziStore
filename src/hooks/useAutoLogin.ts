@@ -1,6 +1,6 @@
 import axios from "axios";
 import { getToken } from "../services/tokenService";
-import { ITokenPayload } from "../@types/inputs";
+import { ITokenPayload } from "../@types/generic";
 import { jwtDecode } from "jwt-decode";
 import { useAppDispatch } from "../REDUX/bigPie";
 import { authActions } from "../REDUX/authSlice";

@@ -1,4 +1,4 @@
-import { ILocation } from "../../@types/inputs";
+import { ILocation } from "../../@types/generic";
 
 const addAdressNormalized = (address: ILocation, addressName: string) => {
   return {

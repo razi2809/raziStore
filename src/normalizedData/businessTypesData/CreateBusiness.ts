@@ -1,4 +1,4 @@
-import { ICreatebusinessInputs, IRegiserInputs } from "../../@types/inputs";
+import { ICreatebusinessInputs, IRegiserInputs } from "../../@types/generic";
 
 const normalCreateBusiness = (inputs: ICreatebusinessInputs) => {
   return {

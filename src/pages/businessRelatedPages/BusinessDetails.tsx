@@ -1,7 +1,6 @@
 import { Box, Grid, Typography } from "@mui/material";
 import { useCallback, useEffect, useState } from "react";
-import { Link, useLocation, useParams } from "react-router-dom";
-import { motion } from "framer-motion";
+import { useLocation, useParams } from "react-router-dom";
 import useFetch from "../../hooks/useFetch";
 import { Iuser } from "../../@types/user";
 import LoaderComponent from "../../layout/layoutRelatedComponents/LoaderComponent";
@@ -12,9 +11,11 @@ import notify from "../../services/toastService";
 import { IProduct } from "../../@types/product";
 import BusinessInfo from "../../components/businessRelatedComponents/BusinessInfo";
 import ProductsInfo from "../../components/productRelatedComponents/ProductsInfo";
-import SelectFilterProducts from "../../components/searchFilters/productsRelatedSelect/SelectFilterProducts";
-import UserSettings from "../../components/userRelatedComponents/UserSettings";
 import BusinessSettings from "../../components/businessRelatedComponents/BusinessSettings";
+import type { changeType } from "../../@types/generic";
+import CategoriesDisplayForBusiness from "../../components/businessRelatedComponents/categoriesDisplayForBusiness";
+import { AxiosError } from "axios";
+import sendData from "../../hooks/useSendData";
 
 type Categories =
   | "business-information"
@@ -60,17 +61,11 @@ const BusinessDetails = () => {
   );
   const [Orders, setOrders] = useState<IOrderData[] | null>(null);
   const [businessLikes, setBusinessLikes] = useState<Iuser[] | null>(null);
-  const [errorState, setErrorState] = useState<string[] | null>(null);
 
   useEffect(() => {
     //  error handling and data setting.
-
-    // Initialize an array to collect error messages.
-    let errors = [];
-
-    // Check for each specific error and add an appropriate message to the array.
+    // Check for each specific error and notfify the user
     if (businessError) {
-      errors.push("An error occurred while fetching user data.");
       notify.error(businessError.message);
       setBusinessProducts(null);
       setBusinessData(null);
@@ -79,24 +74,16 @@ const BusinessDetails = () => {
       setBusinessProducts(business?.products);
     }
     if (userWhomLikedError) {
-      errors.push("An error occurred while fetching liked places.");
       notify.info(userWhomLikedError.message);
       setBusinessLikes(null);
     } else {
       setBusinessLikes(userWhomLiked?.users);
     }
     if (ordersError) {
-      errors.push("An error occurred while fetching order history.");
       notify.info(ordersError.message);
       setOrders(null);
     } else {
       setOrders(businessOrders?.orders);
-    }
-    // If there are any errors, update the errorMessages state.
-    if (errors.length > 0) {
-      setErrorState(errors);
-    } else {
-      setErrorState(null);
     }
   }, [
     businessError,
@@ -104,50 +91,81 @@ const BusinessDetails = () => {
     ordersError,
     business,
     userWhomLiked,
-
     businessOrders,
   ]);
 
-  const addTemporarilyUserDataChange = useCallback(
-    (
-      whatChange: "name" | "email" | "PhoneNumber" | "businessName",
-      data: any
-    ) => {
+  const addTemporarilyUserBusinessChange = useCallback(
+    async (whatChange: changeType, data: any) => {
       if (!business) return;
       switch (whatChange) {
         case "name":
-          setBusinessData((prevUserData) => {
-            if (!prevUserData) return null;
+          setBusinessData((prevBusinessData) => {
+            if (!prevBusinessData) return null;
             return {
-              ...prevUserData,
-              name: data.name,
+              ...prevBusinessData,
+              businessName: data.businessName,
             };
           });
 
           break;
         case "email":
-          setBusinessData((prevUserData) => {
-            if (!prevUserData) return null;
+          setBusinessData((prevBusinessData) => {
+            if (!prevBusinessData) return null;
             return {
-              ...prevUserData,
+              ...prevBusinessData,
               businessEmail: data.businessEmail,
             };
           });
           break;
-        case "PhoneNumber":
-          setBusinessData((prevUserData) => {
-            if (!prevUserData) return null;
+        case "phoneNumber":
+          setBusinessData((prevBusinessData) => {
+            if (!prevBusinessData) return null;
             return {
-              ...prevUserData,
-              phoneNumber: data.phoneNumber,
+              ...prevBusinessData,
+              businessPhoneNumber: data.businessPhoneNumber,
+            };
+          });
+          break;
+        case "businessDescription":
+          setBusinessData((prevBusinessData) => {
+            if (!prevBusinessData) return null;
+            return {
+              ...prevBusinessData,
+              businessDescription: data.businessDescription,
+            };
+          });
+          break;
+        case "image":
+          await updateImageInDataBase(data);
+          setBusinessData((prevBusinessData) => {
+            if (!prevBusinessData) return null;
+            return {
+              ...prevBusinessData,
+              businessImage: { url: data },
             };
           });
           break;
       }
     },
-    [businessData]
+    [business]
   );
-  if (business) {
+  const updateImageInDataBase = async (url: string) => {
+    try {
+      const res = await sendData({
+        url: `/business/image/${BusinessId}`,
+        data: { url },
+        method: "patch",
+      });
+      notify.success(res.message);
+    } catch (e) {
+      if (e instanceof AxiosError) {
+        notify.error(e.message);
+      } else {
+        notify.error("An unknown error occurred");
+      }
+    }
+  };
+  if (businessData) {
     return (
       <Grid>
         <Box
@@ -166,106 +184,13 @@ const BusinessDetails = () => {
             business details
           </Typography>
         </Box>
-        <Box
-          sx={{
-            display: "flex",
-            justifyContent: "space-between",
-            bgcolor: "secondary.main",
-            p: 2,
-            position: "sticky",
-            top: "4em",
-            zIndex: 3,
-          }}
-        >
-          {" "}
-          <Box
-            sx={{
-              display: "flex",
-              flexWrap: "wrap",
-            }}
-          >
-            {categories.map((category) => {
-              const isBusinessOrders = category === "business-orders";
-              const hasOrder = isBusinessOrders ? !!Orders : true;
-              const isBusinessProducts = category === "business-products";
-              const hasProducts = isBusinessProducts
-                ? businessProducts && businessProducts.length > 0
-                : true;
-
-              if (!hasOrder || !hasProducts) return null;
-              return (
-                <Box key={category} sx={{ display: "flex" }}>
-                  <Link to={`#${category}`} style={{ textDecoration: "none" }}>
-                    <Box
-                      sx={{
-                        mr: 2,
-                        borderRadius: 20,
-                        height: "100%",
-                        display: "flex",
-                        alignItems: "center",
-                        position: "relative",
-                        cursor: "pointer",
-                      }}
-                      onClick={() => setActiveSection(category)}
-                    >
-                      <Typography
-                        variant="h6"
-                        sx={{
-                          color: "black",
-                          p: 1,
-                          ":hover": {
-                            color: "white",
-                          },
-                        }}
-                      >
-                        {category}
-                      </Typography>
-                      {activeSection === category && (
-                        <motion.span
-                          style={{
-                            position: "absolute",
-                            top: 50,
-                            height: "2px",
-                            width: "100%",
-                            backgroundColor: "black",
-                          }}
-                          layoutId="activeSectionProfilPage"
-                          transition={{
-                            type: "spring",
-                            stiffness: 380,
-                            damping: 30,
-                          }}
-                        >
-                          {" "}
-                        </motion.span>
-                      )}
-                    </Box>
-                  </Link>
-                </Box>
-              );
-            })}
-          </Box>{" "}
-          {businessProducts && activeSection === "business-products" && (
-            <Box
-              sx={{
-                width: 350,
-                alignItems: "center",
-                display: {
-                  sm: "flex",
-                  xs: "none",
-                  md: "flex",
-                },
-              }}
-            >
-              <Box sx={{ width: "100%" }}>
-                <SelectFilterProducts
-                  setSelectedProduct={null}
-                  data={businessProducts}
-                />
-              </Box>
-            </Box>
-          )}
-        </Box>
+        <CategoriesDisplayForBusiness
+          Orders={businessOrders}
+          businessProducts={businessProducts}
+          activeSection={activeSection}
+          setActiveSection={setActiveSection}
+          categories={categories}
+        />
         {activeSection === "business-information" && businessData && (
           <BusinessInfo
             business={businessData}
@@ -280,20 +205,16 @@ const BusinessDetails = () => {
         {activeSection === "business-products" && businessProducts && (
           <ProductsInfo products={businessProducts} />
         )}
-        {/*    {activeSection === "my-address" && (
-          <AddressInfo askedUserAddresses={userData.address} />
-        )}*/}
         {activeSection === "settings" && businessData && (
           <BusinessSettings
             business={businessData}
-            updateCallBack={addTemporarilyUserDataChange}
+            updateCallBack={addTemporarilyUserBusinessChange}
           />
         )}
       </Grid>
     );
   }
   if (isLoading) return <LoaderComponent />;
-  if (errorState) return null;
   else return null;
 };
 

@@ -1,4 +1,4 @@
-import { IAddress, IImage, IName } from "./inputs";
+import { IAddress, IImage, IName } from "./generic";
 
 interface Iuser {
   email: string;

@@ -17,7 +17,7 @@ import { AxiosError } from "axios";
 import { useAppDispatch, useAppSelector } from "../../REDUX/bigPie";
 import { authActions } from "../../REDUX/authSlice";
 import UserLikedPlacesComponents from "../businessRelatedComponents/UserLikedPlaces";
-import OrderComponents from "../orderRelatedComponents/OrderComponents";
+import OrderComponents from "../orderRelatedComponents/OrderInfoComponents";
 
 interface Props {
   user: Iuser;
@@ -25,7 +25,6 @@ interface Props {
   orderHistory: IOrderData[] | null;
 }
 const PersonalInfo: FC<Props> = ({ user, userLikedPlaces, orderHistory }) => {
-  const [img, setImg] = useState<null | File>(null);
   const [loading, setLoading] = React.useState(false);
   const myUser = useAppSelector((bigPie) => bigPie.authReducer.user);
   const [url, setUrl] = useState<string | null>(null);
@@ -35,10 +34,7 @@ const PersonalInfo: FC<Props> = ({ user, userLikedPlaces, orderHistory }) => {
     const inputElement = e.target as HTMLInputElement;
 
     if (inputElement.files) {
-      setImg(inputElement.files[0]);
       handleImageUpload(inputElement.files[0]);
-    } else {
-      setImg(null);
     }
   };
   const handleImageUpload = async (selectedImage: File) => {

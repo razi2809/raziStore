@@ -6,13 +6,11 @@ import ChangeUserName from "./updateUserRelated/ChangeUserName";
 import { motion } from "framer-motion";
 import ChangeUserEmail from "./updateUserRelated/ChangeUserEmail";
 import ChangeUserPhone from "./updateUserRelated/ChangeUserPhone";
+import type { changeType } from "../../@types/generic";
 
 interface Props {
   user: Iuser;
-  updateUser: <T>(
-    name: "name" | "email" | "PhoneNumber" | "businessName",
-    data: T
-  ) => void;
+  updateUser: <T>(name: changeType, data: T) => void;
 }
 const UserSettings: FC<Props> = ({ user, updateUser }) => {
   const [whatToEdit, setWhatToEdit] = useState("");
@@ -21,9 +19,7 @@ const UserSettings: FC<Props> = ({ user, updateUser }) => {
     email: user.email,
     phoneNumber: user.phoneNumber,
   };
-  const handleEdit = (
-    name: "name" | "email" | "PhoneNumber" | "businessName"
-  ) => {
+  const handleEdit = (name: changeType) => {
     setWhatToEdit(name);
   };
 
@@ -47,7 +43,7 @@ const UserSettings: FC<Props> = ({ user, updateUser }) => {
             <Grid item md={2} xs={0}></Grid>
             <Grid item md={8} xs={10} sx={{ p: 1, mb: 1 }}>
               <SettignsTemplate
-                name={key as "name" | "email" | "PhoneNumber"}
+                name={key as changeType}
                 value={value}
                 handleEdit={handleEdit}
               />

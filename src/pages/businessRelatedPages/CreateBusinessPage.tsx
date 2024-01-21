@@ -15,7 +15,7 @@ import {
   ErrorObj,
   ICreatebusinessInputs,
   ILocation,
-} from "../../@types/inputs";
+} from "../../@types/generic";
 import { storage } from "../../config/fireBase";
 import { useNavigate } from "react-router-dom";
 import GoogleMapToEdit from "../../layout/layoutRelatedComponents/maps/GoogleMapEdit";

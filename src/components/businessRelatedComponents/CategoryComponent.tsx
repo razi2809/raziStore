@@ -1,11 +1,11 @@
-import React, { FC, Fragment, useEffect } from "react";
+import React, { FC, memo, useEffect } from "react";
 import { IProduct } from "../../@types/product";
-import { Box, Divider, Grid, Typography } from "@mui/material";
+import { Box, Grid, Typography } from "@mui/material";
 import ProductTamplateComponent from "../productRelatedComponents/ProductTamplateComponent";
 import { ISelected } from "../../pages/businessRelatedPages/BusinessPage";
-import { useAppSelector } from "../../REDUX/bigPie";
-import { motion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { useInView } from "react-intersection-observer";
+import ProductTamplateDisplay from "../productRelatedComponents/ProductTamplateDisplay";
 const variants = {
   hidden: { opacity: 0, scale: 0.9 },
   visible: { opacity: 1, scale: 1 },
@@ -16,6 +16,8 @@ interface Props {
   setSelectedProduct: React.Dispatch<React.SetStateAction<ISelected | null>>;
   selectedProduct: ISelected | null;
   setActiveSection: React.Dispatch<React.SetStateAction<string>>;
+  isOpen: boolean;
+  updateOrder: (product: IProduct, quantity: number) => void;
 }
 const CategoryComponent: FC<Props> = ({
   category,
@@ -23,6 +25,8 @@ const CategoryComponent: FC<Props> = ({
   setSelectedProduct,
   selectedProduct,
   setActiveSection,
+  isOpen,
+  updateOrder,
 }) => {
   const { ref: categoryRef, inView } = useInView({
     threshold: 1,
@@ -92,8 +96,47 @@ const CategoryComponent: FC<Props> = ({
             }
           })}
       </Grid>
+      <AnimatePresence>
+        {selectedProduct &&
+          products &&
+          products.map((product) => {
+            if (product._id === selectedProduct.productId) {
+              return (
+                <motion.div
+                  key={product._id}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.5 }}
+                  style={{
+                    position: "fixed",
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    backgroundColor: "rgba(0, 0, 0, 0.5)",
+                    zIndex: 1000,
+                  }}
+                  onClick={() => setSelectedProduct(null)}
+                >
+                  <ProductTamplateDisplay
+                    canOrder={isOpen}
+                    product={product}
+                    category={selectedProduct.category}
+                    updateOrder={updateOrder}
+                  />
+                </motion.div>
+              );
+            } else {
+              return null;
+            }
+          })}
+      </AnimatePresence>
     </div>
   );
 };
 
-export default CategoryComponent;
+export default memo(CategoryComponent);

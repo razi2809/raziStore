@@ -7,15 +7,19 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import sendData from "../../hooks/useSendData";
-import { ErrorObj, IUpdateEmailInput } from "../../@types/inputs";
+import sendData from "../../../hooks/useSendData";
+import type {
+  ErrorObj,
+  IUpdateEmailInput,
+  changeType,
+} from "../../../@types/generic";
 import { AxiosError } from "axios";
-import notify from "../../services/toastService";
-import { validateEmailChange } from "../../validation/validationSchema/userSchema/emailChangeSchema";
-import { IBusiness } from "../../@types/business";
+import notify from "../../../services/toastService";
+import { validateEmailChange } from "../../../validation/validationSchema/genericgScema/emailChangeSchema";
+import { IBusiness } from "../../../@types/business";
 interface Props {
   business: IBusiness;
-  updateCallBack: <T>(name: "name" | "email" | "PhoneNumber", data: T) => void;
+  updateCallBack: <T>(name: changeType, data: T) => void;
 }
 const ChangeBusinessEmail: FC<Props> = ({ business, updateCallBack }) => {
   const [errorsState, setErrorsState] = useState<ErrorObj | null>(null);

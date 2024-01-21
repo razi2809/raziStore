@@ -10,7 +10,7 @@ import {
 } from "@mui/material";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import React, { Fragment, useState } from "react";
-import { ErrorObj, IProductInputs } from "../../@types/inputs";
+import { ErrorObj, IProductInputs } from "../../@types/generic";
 import { storage } from "../../config/fireBase";
 import { useNavigate, useParams } from "react-router-dom";
 import sendData from "../../hooks/useSendData";

@@ -8,7 +8,7 @@ import {
 } from "@mui/material";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import React, { Fragment, useState } from "react";
-import { ErrorObj, IVerifyInputs } from "../../@types/inputs";
+import { ErrorObj, IVerifyInputs } from "../../@types/generic";
 import { useNavigate, useParams } from "react-router-dom";
 import { validateVerify } from "../../validation/validationSchema/userSchema/verifyUserSchema";
 import sendData from "../../hooks/useSendData";

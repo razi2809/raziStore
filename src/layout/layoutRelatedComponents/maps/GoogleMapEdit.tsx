@@ -1,7 +1,7 @@
 import { FC, useEffect, useRef, useState } from "react";
 import { Loader } from "@googlemaps/js-api-loader";
 import { Box, useTheme } from "@mui/material";
-import { ILocation } from "../../../@types/inputs";
+import { ILocation } from "../../../@types/generic";
 import { darkMapStyle, lightMapStyle } from "../../../mapStyles";
 import ReactSelect, {
   StylesConfig,

@@ -1,7 +1,7 @@
 import Joi from "joi";
 import { phonePattern } from "../../pattern/phonePattern";
 import { passwordPattern } from "../../pattern/passwordPattern";
-import { IRegiserInputs } from "../../../@types/inputs";
+import { IRegiserInputs } from "../../../@types/generic";
 import validation from "../../validation";
 
 const registerSchema = Joi.object<IRegiserInputs>({

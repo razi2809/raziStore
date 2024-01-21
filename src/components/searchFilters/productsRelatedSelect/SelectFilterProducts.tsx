@@ -73,7 +73,7 @@ const SelectFilterProducts: FC<Props> = ({ data, setSelectedProduct }) => {
   ) => {
     if (!selectedOption) return;
     if (!setSelectedProduct) {
-      navigate(`${ROUTER.PRODUCTS}/${selectedOption.value._id}`);
+      navigate(`${ROUTER.PRODUCT}/${selectedOption.value._id}`);
       return;
     }
     setSelectedProduct({

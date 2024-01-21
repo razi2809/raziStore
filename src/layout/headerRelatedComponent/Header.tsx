@@ -15,7 +15,7 @@ import LinksComponent from "../layoutRelatedComponents/linksRelated/LinksCompone
 import { useAppDispatch, useAppSelector } from "../../REDUX/bigPie";
 import ThemeSwitcher from "../layoutRelatedComponents/ThemeSwitcher";
 import { ROUTER } from "../../Router/ROUTER";
-import OrderComponents from "./OrderComponents";
+import OrderComponents from "../../components/orderRelatedComponents/OrderComponents";
 import UserCardTemplate from "../../components/userRelatedComponents/UserCardTemplate";
 import notify from "../../services/toastService";
 

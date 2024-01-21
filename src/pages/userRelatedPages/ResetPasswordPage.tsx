@@ -15,7 +15,7 @@ import {
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import React, { useState } from "react";
 import { CSSTransition } from "react-transition-group";
-import { ErrorObj, IResetPasswordInputs } from "../../@types/inputs";
+import { ErrorObj, IResetPasswordInputs } from "../../@types/generic";
 import { validateEmail } from "../../validation/validationSchema/userSchema/emailScema";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { validateResetPassword } from "../../validation/validationSchema/userSchema/resetPasswordSchema";

@@ -19,8 +19,9 @@ import { orderActions } from "../../REDUX/orderSlice";
 interface Props {
   order: IOrder;
   ordersHover: React.Dispatch<React.SetStateAction<boolean>>;
+  canHover: Boolean;
 }
-const BusinessOrderTamplate: FC<Props> = ({ order, ordersHover }) => {
+const BusinessOrderTamplate: FC<Props> = ({ order, ordersHover, canHover }) => {
   const [hover, setHover] = useState(false);
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
@@ -35,9 +36,15 @@ const BusinessOrderTamplate: FC<Props> = ({ order, ordersHover }) => {
   if (order.business) {
     return (
       <Box
-        sx={{ height: "4em", position: "relative", mb: 2 }}
-        onMouseEnter={() => setHover(true)}
-        onMouseLeave={() => setHover(false)}
+        sx={{
+          height: "4em",
+          position: "relative",
+          mb: 2,
+          cursor: canHover ? "auto" : "pointer",
+        }}
+        onMouseEnter={() => (canHover ? setHover(true) : null)}
+        onMouseLeave={() => (canHover ? setHover(false) : null)}
+        onClick={() => (canHover ? null : placeAnOrder())}
       >
         <Card
           sx={{
@@ -57,28 +64,13 @@ const BusinessOrderTamplate: FC<Props> = ({ order, ordersHover }) => {
               justifyContent: "space-between",
               width: "100%",
               height: "100%",
-              p: 0,
+              p: 2,
               alignItems: "center",
             }}
           >
-            <Box
-              sx={{
-                display: "flex",
-                alignItems: "center",
-              }}
-            >
-              <Typography variant="h4">
-                {order.business.businessName}
-              </Typography>
-            </Box>
-            <Box
-              sx={{
-                display: "flex",
-                alignItems: "center",
-              }}
-            >
-              <Typography variant="body1">{order.price}</Typography>
-            </Box>
+            <Typography variant="h4">{order.business.businessName}</Typography>
+
+            <Typography variant="body1">{order.price}</Typography>
           </CardContent>
         </Card>
 

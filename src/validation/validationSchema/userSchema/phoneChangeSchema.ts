@@ -1,5 +1,5 @@
 import Joi from "joi";
-import { IUpdatePhoneInput } from "../../../@types/inputs";
+import { IUpdatePhoneInput } from "../../../@types/generic";
 import validation from "../../validation";
 import { phonePattern } from "../../pattern/phonePattern";
 

@@ -8,12 +8,9 @@ import {
 import { IBusiness } from "../../@types/business";
 import { IProduct } from "../../@types/product";
 import { Box, Grid, Typography } from "@mui/material";
-import { AnimatePresence, motion } from "framer-motion";
 import { useAppDispatch, useAppSelector } from "../../REDUX/bigPie";
 import { orderActions } from "../../REDUX/orderSlice";
-import ProductTamplateDisplay from "../../components/productRelatedComponents/ProductTamplateDisplay";
 import CategoryComponent from "../../components/businessRelatedComponents/CategoryComponent";
-import { Link } from "react-router-dom";
 import GoogleMapToView from "../../layout/layoutRelatedComponents/maps/GoogleMapToView";
 import LoaderComponent from "../../layout/layoutRelatedComponents/LoaderComponent";
 import useFetch from "../../hooks/useFetch";
@@ -22,9 +19,9 @@ import { ROUTER } from "../../Router/ROUTER";
 import EditIcon from "@mui/icons-material/Edit";
 import AddIcon from "@mui/icons-material/Add";
 import useBusinessOpen from "../../hooks/useBusinessOpen";
-import SelectFilterProducts from "../../components/searchFilters/productsRelatedSelect/SelectFilterProducts";
 import CustomSpeedDial from "../../layout/layoutRelatedComponents/CustomSpeedDial";
 import notify from "../../services/toastService";
+import CategoriseDisplayerWithSelection from "../../components/genericComponents/CategoriseDisplayerWithSelection";
 export interface ISelected {
   productId: string | null;
   category: string | null;
@@ -40,7 +37,7 @@ const BusinessPage = () => {
   const { BusinessId } = useParams();
   const location = useLocation();
   const user = useAppSelector((bigPie) => bigPie.authReducer);
-  const [activeSection, setActiveSection] = useState("sale");
+  const [activeSection, setActiveSection] = useState("");
   const [searchParams] = useSearchParams();
   const productId = searchParams.get("item");
   const category = searchParams.get("category");
@@ -51,16 +48,14 @@ const BusinessPage = () => {
   const { pathname } = location;
   const navigate = useNavigate();
   const { data, error, loading } = useFetch(`/business/${BusinessId}`);
-  // const business = data.business as IBusiness;
-  // const products = data.products as IProduct[];
+
   const [business, setBusiness] = useState<IBusiness | null>(null);
   const [products, setProducts] = useState<IProduct[] | null>(null);
   const isOpen = useBusinessOpen(business);
   useEffect(() => {
-    // Check if there's an error after fetching data.
     if (error) {
       // Handle the error, e.g., by setting an error message in the state,
-      //or showing a toast notification to the user.
+      // showing a toast notification to the user.
       notify.error(error.message);
     } else if (data) {
       // If there's no error and data is present, update the businesses state.
@@ -120,7 +115,7 @@ const BusinessPage = () => {
         url: `https://razi2809.github.io/raziStore${ROUTER.BUSINESS}/${business._id}`,
       });
     } else {
-      console.log("Web Share API is not supported in your browser");
+      notify.error("Web Share API is not supported in your browser");
     }
   };
 
@@ -159,99 +154,14 @@ const BusinessPage = () => {
             </Typography>
           </Box>{" "}
         </Box>
-        <Box
-          sx={{
-            bgcolor: "secondary.main",
-            borderBottom: "1px solid rgba(32, 33, 37, 0.12)",
-            display: "flex",
-            justifyContent: "space-between",
-            p: 1,
-            position: "sticky",
-            top: "4em",
-            zIndex: 3,
-          }}
-        >
-          <Box
-            sx={{
-              width: 350,
-              zIndex: 3,
-              display: {
-                md: "flex",
-                sm: "flex",
-                xs: "none",
-              },
-              alignItems: "center",
-              ml: 3,
-            }}
-          >
-            <Box sx={{ width: "100%" }}>
-              <SelectFilterProducts
-                data={products}
-                setSelectedProduct={setSelectedProduct}
-              />
-            </Box>
-          </Box>
-          <Box
-            sx={{
-              mr: 4,
-              display: "flex",
-              flexWrap: "wrap",
-            }}
-          >
-            {business?.categories &&
-              business?.categories.length > 0 &&
-              business?.categories.map((category) => (
-                <Box key={category} sx={{ display: "flex" }}>
-                  <Link to={`#${category}`} style={{ textDecoration: "none" }}>
-                    <Box
-                      sx={{
-                        mr: 2,
-                        borderRadius: 20,
-                        height: "100%",
-                        display: "flex",
-                        alignItems: "center",
-                        position: "relative",
-                        cursor: "pointer",
-                      }}
-                      onClick={() => setActiveSection(category)}
-                    >
-                      <Typography
-                        variant="h6"
-                        sx={{
-                          color: "black",
-                          p: 1,
-                          ":hover": {
-                            color: "white",
-                          },
-                        }}
-                      >
-                        {category}
-                      </Typography>
-                      {activeSection === category && (
-                        <motion.span
-                          style={{
-                            position: "absolute",
-                            top: 50,
-                            height: "2px",
-                            width: "100%",
-                            backgroundColor: "black",
-                          }}
-                          layoutId="activeSection"
-                          transition={{
-                            type: "spring",
-                            stiffness: 380,
-                            damping: 30,
-                          }}
-                        >
-                          {" "}
-                        </motion.span>
-                      )}
-                    </Box>
-                  </Link>
-                </Box>
-              ))}
-          </Box>{" "}
-        </Box>
+        <CategoriseDisplayerWithSelection
+          products={products}
+          business={business}
+          setActiveSection={setActiveSection}
+          activeSection={activeSection}
+          setSelectedProduct={setSelectedProduct}
+        />
+
         <Grid container sx={{ bgcolor: "divider" }}>
           {business?.categories &&
             business?.categories.length > 0 &&
@@ -263,6 +173,8 @@ const BusinessPage = () => {
                 products={products}
                 setSelectedProduct={setSelectedProduct}
                 selectedProduct={selectedProduct}
+                isOpen={isOpen}
+                updateOrder={updateOrder}
               />
             ))}
         </Grid>
@@ -298,45 +210,6 @@ const BusinessPage = () => {
             }}
           ></Box>
         </Box>
-        <AnimatePresence>
-          {selectedProduct &&
-            products &&
-            products.map((product) => {
-              if (product._id === selectedProduct.productId) {
-                return (
-                  <motion.div
-                    key={product._id}
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    transition={{ duration: 0.5 }}
-                    style={{
-                      position: "fixed",
-                      top: 0,
-                      left: 0,
-                      right: 0,
-                      bottom: 0,
-                      display: "flex",
-                      justifyContent: "center",
-                      alignItems: "center",
-                      backgroundColor: "rgba(0, 0, 0, 0.5)",
-                      zIndex: 1000,
-                    }}
-                    onClick={() => setSelectedProduct(null)}
-                  >
-                    <ProductTamplateDisplay
-                      canOrder={isOpen}
-                      product={product}
-                      category={selectedProduct.category}
-                      updateOrder={updateOrder}
-                    />
-                  </motion.div>
-                );
-              } else {
-                return null;
-              }
-            })}
-        </AnimatePresence>
       </Grid>
     );
   } else if (loading) {

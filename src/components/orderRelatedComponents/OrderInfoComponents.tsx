@@ -3,28 +3,27 @@ import { FC, Fragment, memo, useEffect, useState } from "react";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { motion } from "framer-motion";
-import OrderHistoryComponents from "../orderRelatedComponents/OrderCardComponents";
-import { Iuser } from "../../@types/user";
-import UserTemplateComponent from "../userRelatedComponents/UserTemplateComponent";
+import { IOrderData } from "../../@types/order";
+import OrderCardComponents from "./OrderCardComponents";
 interface Props {
-  usersData: Iuser[] | null;
+  ordersdata: IOrderData[] | null;
 }
-const UserWhomLikeComponent: FC<Props> = ({ usersData }) => {
+const OrderComponents: FC<Props> = ({ ordersdata }) => {
   const TOTAL_PER_PAGE = 4;
-  const [users, setUser] = useState<Iuser[] | null>(usersData);
-  const [userIndex, setUserIndex] = useState(1);
+  const [orders, setOrders] = useState<IOrderData[] | null>(ordersdata);
+  const [orderIndex, setOrderIndex] = useState(1);
 
   useEffect(() => {
     //  handling order history pagination
-    if (!usersData) return;
-    const start = userIndex - 1;
+    if (!ordersdata) return;
+    const start = orderIndex - 1;
     const end = start + TOTAL_PER_PAGE;
-    setUser(usersData.slice(start, end));
-  }, [usersData, userIndex]);
+    setOrders(ordersdata.slice(start, end));
+  }, [ordersdata, orderIndex]);
 
   return (
     <Fragment>
-      {usersData && usersData.length > 0 && (
+      {ordersdata && ordersdata.length > 0 && (
         <Grid sx={{ mt: 2 }}>
           <Grid item xs={12}>
             <Box sx={{ display: "flex", justifyContent: "space-between" }}>
@@ -33,10 +32,10 @@ const UserWhomLikeComponent: FC<Props> = ({ usersData }) => {
                   variant="h4"
                   sx={{ color: "text.primary", textAlign: "start" }}
                 >
-                  users who liked the business
+                  orders
                 </Typography>
               </Box>
-              {usersData.length > 4 && (
+              {ordersdata.length > 4 && (
                 <Box>
                   <Fab
                     sx={{
@@ -46,8 +45,8 @@ const UserWhomLikeComponent: FC<Props> = ({ usersData }) => {
                       width: 35,
                       zIndex: 1,
                     }}
-                    disabled={userIndex === 1}
-                    onClick={() => setUserIndex(userIndex - 1)}
+                    disabled={orderIndex === 1}
+                    onClick={() => setOrderIndex(orderIndex - 1)}
                   >
                     <ArrowBackIcon />
                   </Fab>
@@ -60,9 +59,9 @@ const UserWhomLikeComponent: FC<Props> = ({ usersData }) => {
                       zIndex: 1,
                     }}
                     disabled={
-                      userIndex - 1 === usersData.length - TOTAL_PER_PAGE
+                      orderIndex - 1 === ordersdata.length - TOTAL_PER_PAGE
                     }
-                    onClick={() => setUserIndex(userIndex + 1)}
+                    onClick={() => setOrderIndex(orderIndex + 1)}
                   >
                     <ArrowForwardIcon />
                   </Fab>
@@ -74,10 +73,10 @@ const UserWhomLikeComponent: FC<Props> = ({ usersData }) => {
               spacing={2}
               sx={{ mt: 1, justifyContent: "center" }}
             >
-              {users &&
-                users.length > 0 &&
-                users.map((user) => (
-                  <Grid item md={3} sm={6} xs={12} key={user._id}>
+              {orders &&
+                orders.length > 0 &&
+                orders.map((order) => (
+                  <Grid item md={3} sm={6} xs={12} key={order._id}>
                     {" "}
                     <motion.div
                       initial={{ opacity: 0 }}
@@ -85,11 +84,7 @@ const UserWhomLikeComponent: FC<Props> = ({ usersData }) => {
                       transition={{ duration: 0.5 }}
                       style={{ height: "100%" }}
                     >
-                      <UserTemplateComponent
-                        user={user}
-                        setSelectedUser={null}
-                        canDelete={false}
-                      />
+                      <OrderCardComponents order={order} />
                     </motion.div>
                   </Grid>
                 ))}
@@ -101,4 +96,4 @@ const UserWhomLikeComponent: FC<Props> = ({ usersData }) => {
   );
 };
 
-export default memo(UserWhomLikeComponent);
+export default memo(OrderComponents);

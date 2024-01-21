@@ -1,6 +1,6 @@
 import Joi from "joi";
 import { passwordPattern } from "../../pattern/passwordPattern";
-import { IResetPasswordInputs } from "../../../@types/inputs";
+import { IResetPasswordInputs } from "../../../@types/generic";
 import validation from "../../validation";
 
 const resetPasswordSchema = Joi.object<IResetPasswordInputs>({

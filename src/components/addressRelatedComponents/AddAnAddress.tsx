@@ -12,7 +12,7 @@ import { useAppDispatch, useAppSelector } from "../../REDUX/bigPie";
 import ClearIcon from "@mui/icons-material/Clear";
 import sendData from "../../hooks/useSendData";
 import GoogleMapToEdit from "../../layout/layoutRelatedComponents/maps/GoogleMapEdit";
-import { ILocation } from "../../@types/inputs";
+import { ILocation } from "../../@types/generic";
 import { addAdressNormalized } from "../../normalizedData/userTypesData/addAddress";
 import { authActions } from "../../REDUX/authSlice";
 import { AxiosError } from "axios";

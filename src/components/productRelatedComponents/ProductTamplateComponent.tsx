@@ -34,6 +34,7 @@ const ProductTamplateComponent: FC<Props> = ({
   const user = useAppSelector((bigPie) => bigPie.authReducer);
   const [like, setLike] = useState(product.likes.includes(user.user?._id));
   const [hover, setHover] = useState(false);
+
   const navigate = useNavigate();
   const handleProductLike = async (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>
@@ -70,6 +71,7 @@ const ProductTamplateComponent: FC<Props> = ({
     }
     product.likes.push(user.user?._id);
   };
+
   const handleShare = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     e.stopPropagation();
 
@@ -85,7 +87,7 @@ const ProductTamplateComponent: FC<Props> = ({
   };
   const handleEdit = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     e.stopPropagation();
-    navigate(`${ROUTER.PRODUCTS}/${product._id}`);
+    navigate(`${ROUTER.PRODUCT}/${product._id}`);
   };
   const isProductAvailable = product.productQuantity !== 0;
   const handleProductSelection = () => {
@@ -98,7 +100,7 @@ const ProductTamplateComponent: FC<Props> = ({
       sx={{
         p: 2,
         width: "100%",
-        height: "10em",
+        height: "11em",
         position: "relative",
         cursor: "pointer",
         transition: "transform 0.5s ease",

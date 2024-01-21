@@ -1,4 +1,4 @@
-import { IProductInputs } from "../../@types/inputs";
+import { IProductInputs } from "../../@types/generic";
 
 export const newProductNormalized = (inputs: IProductInputs) => {
   const categories = [

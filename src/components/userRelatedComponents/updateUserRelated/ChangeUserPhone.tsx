@@ -9,16 +9,19 @@ import {
 } from "@mui/material";
 import { useAppDispatch, useAppSelector } from "../../../REDUX/bigPie";
 import sendData from "../../../hooks/useSendData";
-import { ErrorObj, IUpdatePhoneInput } from "../../../@types/inputs";
+import type {
+  ErrorObj,
+  IUpdatePhoneInput,
+  changeType,
+} from "../../../@types/generic";
 import { authActions } from "../../../REDUX/authSlice";
 import { AxiosError } from "axios";
 import notify from "../../../services/toastService";
 import { Iuser } from "../../../@types/user";
-import { validateEmailChange } from "../../../validation/validationSchema/userSchema/emailChangeSchema";
 import { validatePhoneChange } from "../../../validation/validationSchema/userSchema/phoneChangeSchema";
 interface Props {
   user: Iuser;
-  updateUser: <T>(name: "name" | "email" | "PhoneNumber", data: T) => void;
+  updateUser: <T>(name: changeType, data: T) => void;
 }
 const ChangeUserPhone: FC<Props> = ({ user, updateUser }) => {
   const [errorsState, setErrorsState] = useState<ErrorObj | null>(null);
@@ -51,7 +54,7 @@ const ChangeUserPhone: FC<Props> = ({ user, updateUser }) => {
           authActions.editTemperarlyPhone({ phoneNumber: data.phoneNumber })
         );
       }
-      updateUser("PhoneNumber", data);
+      updateUser("phoneNumber", data);
     } catch (e) {
       if (e instanceof AxiosError) {
         notify.error(e.response?.data.message);

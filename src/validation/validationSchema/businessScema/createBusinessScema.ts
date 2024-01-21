@@ -1,6 +1,6 @@
 import Joi from "joi";
 import { phonePattern } from "../../pattern/phonePattern";
-import { ICreatebusinessInputs } from "../../../@types/inputs";
+import { ICreatebusinessInputs } from "../../../@types/generic";
 import validation from "../../validation";
 import { IOpeningHours, IOpeningHoursInDay } from "../../../@types/business";
 const daySchema = Joi.object<IOpeningHoursInDay>({

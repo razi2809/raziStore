@@ -1,4 +1,4 @@
-import { IRegiserInputs } from "../../@types/inputs";
+import { IRegiserInputs } from "../../@types/generic";
 
 const normalRegister = (inputs: IRegiserInputs) => {
   return {

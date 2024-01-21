@@ -1,5 +1,5 @@
 import Joi from "joi";
-import { ErrorObj } from "../@types/inputs";
+import { ErrorObj } from "../@types/generic";
 
 const validation = (schema: Joi.ObjectSchema, userInput: any) => {
   const { error } = schema.validate(userInput, { abortEarly: false });

@@ -1,7 +1,6 @@
 import { Box, Grid, Typography } from "@mui/material";
 import { useCallback, useEffect, useState } from "react";
-import { Link, useLocation, useParams } from "react-router-dom";
-import { motion } from "framer-motion";
+import { useLocation, useParams } from "react-router-dom";
 import PersonalInfo from "../../components/userRelatedComponents/PersonalInfo";
 import useFetch from "../../hooks/useFetch";
 import { Iuser } from "../../@types/user";
@@ -12,7 +11,8 @@ import OrderHistoryInfo from "../../components/orderRelatedComponents/OrdersInfo
 import AddressInfo from "../../components/userRelatedComponents/AddressInfo";
 import notify from "../../services/toastService";
 import UserSettings from "../../components/userRelatedComponents/UserSettings";
-// Define the possible categories for the profile page.
+import type { changeType } from "../../@types/generic";
+import CategoryDisplayForUser from "../../components/userRelatedComponents/CategoryDisppalyForUser";
 
 type Categories =
   | "personal-information"
@@ -59,42 +59,30 @@ const ProfilePage = () => {
   const [userLikedPlaces, setUserLikedPlaces] = useState<IBusiness[] | null>(
     null
   );
-  const [errorState, setErrorState] = useState<string[] | null>(null);
 
   useEffect(() => {
     //  error handling and data setting.
 
-    // Initialize an array to collect error messages.
-    let errors = [];
-
-    // Check for each specific error and add an appropriate message to the array.
+    // Check for each specific error and and notify the user
     if (userError) {
-      errors.push("An error occurred while fetching user data.");
       notify.error(userError.message);
+      console.log(userError);
 
       setUserData(null);
     } else {
       setUserData(user?.user);
     }
     if (likedPlacesError) {
-      errors.push("An error occurred while fetching liked places.");
       notify.info(likedPlacesError.message);
       setUserLikedPlaces(null);
     } else {
       setUserLikedPlaces(likedPlaces?.likedPlaces);
     }
     if (orderHistoryError) {
-      errors.push("An error occurred while fetching order history.");
       notify.info(orderHistoryError.message);
       setUserOrderHistory(null);
     } else {
       setUserOrderHistory(orderHistory?.orderHistory);
-    }
-    // If there are any errors, update the errorMessages state.
-    if (errors.length > 0) {
-      setErrorState(errors);
-    } else {
-      setErrorState(null);
     }
   }, [
     userError,
@@ -106,10 +94,7 @@ const ProfilePage = () => {
   ]);
 
   const addTemporarilyUserDataChange = useCallback(
-    (
-      whatChange: "name" | "email" | "PhoneNumber" | "businessName",
-      data: any
-    ) => {
+    (whatChange: changeType, data: any) => {
       if (!userData) return;
       switch (whatChange) {
         case "name":
@@ -131,7 +116,7 @@ const ProfilePage = () => {
             };
           });
           break;
-        case "PhoneNumber":
+        case "phoneNumber":
           setUserData((prevUserData) => {
             if (!prevUserData) return null;
             return {
@@ -160,89 +145,14 @@ const ProfilePage = () => {
             profile
           </Typography>
         </Box>
-        <Box
-          sx={{
-            display: "flex",
-            justifyContent: "flex-start",
-            bgcolor: "secondary.main",
-            p: 2,
-            position: "sticky",
-            top: "4em",
-            zIndex: 3,
-          }}
-        >
-          {" "}
-          <Box
-            sx={{
-              display: "flex",
-              flexWrap: "wrap",
-            }}
-          >
-            {categories.map((category) => {
-              const isOrder =
-                category === "order-history"
-                  ? userOrderHistory
-                    ? true
-                    : false
-                  : true;
-              return (
-                isOrder && (
-                  <Box key={category} sx={{ display: "flex" }}>
-                    <Link
-                      to={`#${category}`}
-                      style={{ textDecoration: "none" }}
-                    >
-                      <Box
-                        sx={{
-                          mr: 2,
-                          borderRadius: 20,
-                          height: "100%",
-                          display: "flex",
-                          alignItems: "center",
-                          position: "relative",
-                          cursor: "pointer",
-                        }}
-                        onClick={() => setActiveSection(category)}
-                      >
-                        <Typography
-                          variant="h6"
-                          sx={{
-                            color: "black",
-                            p: 1,
-                            ":hover": {
-                              color: "white",
-                            },
-                          }}
-                        >
-                          {category}
-                        </Typography>
-                        {activeSection === category && (
-                          <motion.span
-                            style={{
-                              position: "absolute",
-                              top: 50,
-                              height: "2px",
-                              width: "100%",
-                              backgroundColor: "black",
-                            }}
-                            layoutId="activeSectionProfilPage"
-                            transition={{
-                              type: "spring",
-                              stiffness: 380,
-                              damping: 30,
-                            }}
-                          >
-                            {" "}
-                          </motion.span>
-                        )}
-                      </Box>
-                    </Link>
-                  </Box>
-                )
-              );
-            })}
-          </Box>
-        </Box>
+
+        <CategoryDisplayForUser
+          userOrderHistory={userOrderHistory}
+          activeSection={activeSection}
+          setActiveSection={setActiveSection}
+          categories={categories}
+        />
+
         {activeSection === "personal-information" && (
           <PersonalInfo
             user={userData}
@@ -266,7 +176,6 @@ const ProfilePage = () => {
     );
   }
   if (isLoading) return <LoaderComponent />;
-  if (errorState) return null;
   else return null;
 };
 

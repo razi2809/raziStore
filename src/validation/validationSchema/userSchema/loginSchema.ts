@@ -1,5 +1,5 @@
 import Joi from "joi";
-import { ILoginInputs } from "../../../@types/inputs";
+import { ILoginInputs } from "../../../@types/generic";
 import validation from "../../validation";
 import { passwordPattern } from "../../pattern/passwordPattern";
 

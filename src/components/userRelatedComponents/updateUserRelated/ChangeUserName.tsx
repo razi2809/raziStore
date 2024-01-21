@@ -9,7 +9,11 @@ import {
 } from "@mui/material";
 import { useAppDispatch, useAppSelector } from "../../../REDUX/bigPie";
 import sendData from "../../../hooks/useSendData";
-import { ErrorObj, IUpdateNameInputs } from "../../../@types/inputs";
+import type {
+  ErrorObj,
+  IUpdateNameInputs,
+  changeType,
+} from "../../../@types/generic";
 import { authActions } from "../../../REDUX/authSlice";
 import { AxiosError } from "axios";
 import notify from "../../../services/toastService";
@@ -17,7 +21,7 @@ import { validateNameChange } from "../../../validation/validationSchema/userSch
 import { Iuser } from "../../../@types/user";
 interface Props {
   user: Iuser;
-  updateUser: <T>(name: "name" | "email" | "PhoneNumber", data: T) => void;
+  updateUser: <T>(name: changeType, data: T) => void;
 }
 const ChangeUserName: FC<Props> = ({ user, updateUser }) => {
   const [errorsState, setErrorsState] = useState<ErrorObj | null>(null);

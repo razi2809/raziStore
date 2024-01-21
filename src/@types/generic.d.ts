@@ -17,11 +17,20 @@ export interface IUpdateNameInputs {
   firstName: string;
   lastName: string;
 }
+export interface IUpdatespecialNameInputs {
+  name: string;
+}
 export interface IUpdateEmailInput {
   email: string;
 }
 export interface IUpdatePhoneInput {
   phoneNumber: string;
+}
+export interface IUpdateDescriptionInput {
+  description: string;
+}
+export interface IUpdateQuantityInput {
+  quantity: number;
 }
 export interface IProductInputs {
   productName: string;
@@ -84,3 +93,13 @@ export interface IResetPasswordInputs {
   password: string;
   passwordConfirmation: string;
 }
+export type changeType =
+  | "name"
+  | "email"
+  | "phoneNumber"
+  | "businessName"
+  | "businessDescription"
+  | "image"
+  | "productName"
+  | "productDescription"
+  | "productQuantity";

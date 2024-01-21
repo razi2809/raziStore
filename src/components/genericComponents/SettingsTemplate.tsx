@@ -1,9 +1,11 @@
 import { FC } from "react";
 import { Box, Typography, useTheme } from "@mui/material";
+import type { changeType } from "../../@types/generic";
+
 interface Props {
-  name: "name" | "email" | "PhoneNumber";
-  value: string;
-  handleEdit: (name: "name" | "email" | "PhoneNumber" | "businessName") => void;
+  name: changeType;
+  value: string | number;
+  handleEdit: (name: changeType) => void;
 }
 const SettingsTemplate: FC<Props> = ({ name, value, handleEdit }) => {
   const theme = useTheme();

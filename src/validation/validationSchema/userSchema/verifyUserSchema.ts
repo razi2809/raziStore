@@ -1,5 +1,5 @@
 import Joi from "joi";
-import { IVerifyInputs } from "../../../@types/inputs";
+import { IVerifyInputs } from "../../../@types/generic";
 import validation from "../../validation";
 
 const verifyUserSchema = Joi.object<IVerifyInputs>({

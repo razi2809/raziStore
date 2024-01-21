@@ -10,7 +10,7 @@ import {
 } from "@mui/material";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import React, { Fragment, useState } from "react";
-import { ErrorObj, ILocation, IRegiserInputs } from "../../@types/inputs";
+import { ErrorObj, ILocation, IRegiserInputs } from "../../@types/generic";
 import { validateRegister } from "../../validation/validationSchema/userSchema/registerSchema";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { storage } from "../../config/fireBase";
@@ -20,6 +20,7 @@ import GoogleMapToEdit from "../../layout/layoutRelatedComponents/maps/GoogleMap
 import sendData from "../../hooks/useSendData";
 import notify from "../../services/toastService";
 import { AxiosError } from "axios";
+import { ROUTER } from "../../Router/ROUTER";
 const defaultAvatarUrl =
   "https://firebasestorage.googleapis.com/v0/b/social-media-27267.appspot.com/o/images%2FavatarDefaulPic.png?alt=media&token=1ca6c08e-505f-465b-bcd9-3d47c9b1c28f";
 const RegisterPage = () => {
@@ -136,8 +137,7 @@ const RegisterPage = () => {
       });
       //user created go to verifiey it
       notify.success(res.message);
-
-      navigate(`/verify/${inputs.email}`);
+      navigate(`${ROUTER.VERIFY}/${inputs.email}`);
     } catch (e) {
       if (e instanceof AxiosError) {
         notify.error(e.response?.data.message);

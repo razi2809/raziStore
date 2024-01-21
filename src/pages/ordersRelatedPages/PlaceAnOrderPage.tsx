@@ -13,7 +13,7 @@ import ReactSelect, {
 import { motion } from "framer-motion";
 import GoogleMaps2markers from "../../layout/layoutRelatedComponents/maps/GoogleMaps2markers";
 import ProductOrderTamplate from "../../components/productRelatedComponents/ProductOrderTamplate";
-import { ILocation } from "../../@types/inputs";
+import { ILocation } from "../../@types/generic";
 import GoogleMapToView from "../../layout/layoutRelatedComponents/maps/GoogleMapToView";
 import { orderActions } from "../../REDUX/orderSlice";
 import { ROUTER } from "../../Router/ROUTER";

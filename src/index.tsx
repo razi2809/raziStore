@@ -7,7 +7,7 @@ import LayoutComponents from "./layout/layoutRelatedComponents/LayoutComponents"
 import { getToken } from "./services/tokenService";
 import { Provider } from "react-redux";
 import { store } from "./REDUX/bigPie";
-axios.defaults.baseURL = "http://localhost:8080/";
+axios.defaults.baseURL = "https://razistoreapp.site/";
 axios.interceptors.request.use((config) => {
   const tokenoOBj = getToken();
   if (tokenoOBj.token) {

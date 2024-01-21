@@ -11,7 +11,7 @@ import {
 } from "@mui/material";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import React, { Fragment, useState } from "react";
-import { ErrorObj, ILoginInputs } from "../../@types/inputs";
+import { ErrorObj, ILoginInputs } from "../../@types/generic";
 import { validateLogin } from "../../validation/validationSchema/userSchema/loginSchema";
 import { storeToken } from "../../services/tokenService";
 import useAutoLogin from "../../hooks/useAutoLogin";
@@ -19,6 +19,8 @@ import { Link } from "react-router-dom";
 import { ROUTER } from "../../Router/ROUTER";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import sendData from "../../hooks/useSendData";
+import { AxiosError } from "axios";
+import notify from "../../services/toastService";
 const LoginPage = () => {
   const [inputs, setInputs] = useState<ILoginInputs>({
     email: "",
@@ -65,9 +67,13 @@ const LoginPage = () => {
       });
       storeToken(res.token, secondtrychance);
       login();
+      notify.success(res.message);
     } catch (e) {
-      //register have failed
-      console.log(e);
+      if (e instanceof AxiosError) {
+        notify.error(e.response?.data.message);
+      } else {
+        notify.error("An unknown error occurred");
+      }
     }
   };
   return (

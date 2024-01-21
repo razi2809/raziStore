@@ -4,8 +4,8 @@ import { Box, Grid, Typography } from "@mui/material";
 import { IBusiness } from "../../@types/business";
 import { IOrderData } from "../../@types/order";
 import { useAppSelector } from "../../REDUX/bigPie";
-import OrderComponents from "../orderRelatedComponents/OrderComponents";
-import UserWhomLikeComponent from "./UserWhomLikeComponent";
+import OrderComponents from "../orderRelatedComponents/OrderInfoComponents";
+import UserWhomLikeComponent from "../userRelatedComponents/UserWhomLikeComponent";
 import GoogleMapToView from "../../layout/layoutRelatedComponents/maps/GoogleMapToView";
 
 interface Props {
@@ -15,7 +15,6 @@ interface Props {
 }
 const BusinessInfo: FC<Props> = ({ business, userWhomLiked, ordersData }) => {
   const user = useAppSelector((bigPie) => bigPie.authReducer.user);
-  /* const dispatch = useAppDispatch(); */
   return (
     <Grid>
       <Box sx={{ p: 2 }}>

@@ -14,7 +14,7 @@ const CustomSpeedDial: FC<Props> = ({ actions, onActionClick, canEdit }) => {
 
   return (
     <SpeedDial
-      ariaLabel="SpeedDial tooltip example"
+      ariaLabel="SpeedDial"
       sx={{ position: "absolute", top: 50, right: 50 }}
       icon={<SpeedDialIcon />}
       onClose={() => setOpen(false)}

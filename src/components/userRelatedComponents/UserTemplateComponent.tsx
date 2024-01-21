@@ -60,7 +60,7 @@ const UserTemplateComponent: FC<Props> = ({
         transform: hover ? "scale(1.02)" : "",
       }}
     >
-      {user.isAdmin && canDelete && (
+      {myUser && myUser.isAdmin && canDelete && (
         <div style={{ position: "absolute", top: 0, right: 0, zIndex: 2 }}>
           <Tooltip title="delete user">
             <IconButton onClick={(e) => handleDeleteUser(e)}>
