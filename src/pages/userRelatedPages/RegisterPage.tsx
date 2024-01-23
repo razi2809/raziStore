@@ -21,6 +21,7 @@ import sendData from "../../hooks/useSendData";
 import notify from "../../services/toastService";
 import { AxiosError } from "axios";
 import { ROUTER } from "../../Router/ROUTER";
+import { MessageType } from "antd/es/message/interface";
 const defaultAvatarUrl =
   "https://firebasestorage.googleapis.com/v0/b/social-media-27267.appspot.com/o/images%2FavatarDefaulPic.png?alt=media&token=1ca6c08e-505f-465b-bcd9-3d47c9b1c28f";
 const RegisterPage = () => {
@@ -93,6 +94,7 @@ const RegisterPage = () => {
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
+      const hideLoading = notify.loading("regisering...");
       if (img) {
         //there is image then upload it to fire base
         //and then sent to server
@@ -110,7 +112,7 @@ const RegisterPage = () => {
               .getDownloadURL()
               .then(async (url) => {
                 inputs.url = url;
-                register(inputs);
+                register(inputs, hideLoading);
               });
           }
         );
@@ -118,14 +120,14 @@ const RegisterPage = () => {
       //there is no image that he wish to upload so jest send to server
       if (!img) {
         inputs.url = defaultAvatarUrl;
-        register(inputs);
+        register(inputs, hideLoading);
       }
     } catch (e) {
       //register have failed
       console.log(e);
     }
   };
-  const register = async (inputs: IRegiserInputs) => {
+  const register = async (inputs: IRegiserInputs, hideLoading: MessageType) => {
     //set up the inputs ready to send to the server
     inputs.buildingNumber = Number(inputs.buildingNumber);
     try {
@@ -136,9 +138,12 @@ const RegisterPage = () => {
         method: "post",
       });
       //user created go to verifiey it
+      hideLoading();
       notify.success(res.message);
       navigate(`${ROUTER.VERIFY}/${inputs.email}`);
     } catch (e) {
+      hideLoading();
+
       if (e instanceof AxiosError) {
         notify.error(e.response?.data.message);
       } else {

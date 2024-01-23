@@ -13,6 +13,8 @@ import { useNavigate, useParams } from "react-router-dom";
 import { validateVerify } from "../../validation/validationSchema/userSchema/verifyUserSchema";
 import sendData from "../../hooks/useSendData";
 import { ROUTER } from "../../Router/ROUTER";
+import { AxiosError } from "axios";
+import notify from "../../services/toastService";
 const VerifyUserPage = () => {
   const navigate = useNavigate();
   let { email } = useParams();
@@ -48,25 +50,28 @@ const VerifyUserPage = () => {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    const hideLoading = notify.loading("verifying...");
+
     try {
-      await sendData({
+      const res = await sendData({
         url: `/users/verify/${inputs.email}/${inputs.verificationCode}`,
         method: "post",
       });
+      hideLoading();
+      notify.success(res.message);
       navigate(ROUTER.LOGIN);
     } catch (e) {
-      //register have failed
-      console.log(e);
+      hideLoading();
+      if (e instanceof AxiosError) {
+        notify.error(e.response?.data.message);
+      } else {
+        notify.error("An unknown error occurred");
+      }
     }
   };
   return (
-    <Grid>
-      <Box
-        component="form"
-        noValidate
-        onSubmit={(e) => handleSubmit(e)}
-        sx={{ p: 25 }}
-      >
+    <Grid sx={{ paddingTop: 6, marginBottom: 10 }}>
+      <Box component="form" noValidate onSubmit={(e) => handleSubmit(e)}>
         <Grid container sx={{ mt: 0 }}>
           <Grid container item md={3} sm={2} xs={1}></Grid>
           <Grid

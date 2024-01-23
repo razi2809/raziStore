@@ -59,6 +59,8 @@ const LoginPage = () => {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    const hideLoading = notify.loading("login...");
+
     try {
       const res = await sendData({
         url: `/auth/login`,
@@ -67,8 +69,10 @@ const LoginPage = () => {
       });
       storeToken(res.token, secondtrychance);
       login();
+      hideLoading();
       notify.success(res.message);
     } catch (e) {
+      hideLoading();
       if (e instanceof AxiosError) {
         notify.error(e.response?.data.message);
       } else {

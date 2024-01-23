@@ -46,6 +46,14 @@ const authSlice = createSlice({
         state.user.phoneNumber = action.payload.phoneNumber;
       }
     },
+    editTemperarlyTheme: (
+      state,
+      action: PayloadAction<{ theme: "dark" | "light" }>
+    ) => {
+      if (state.user && state.user.phoneNumber) {
+        state.user.theme = action.payload.theme;
+      }
+    },
   },
 });
 export const authActions = authSlice.actions;
