@@ -79,7 +79,7 @@ const CategoryComponent: FC<Props> = ({
                   sx={{ position: "relative" }}
                 >
                   <motion.div
-                    style={{ width: "90%", height: "9em" }}
+                    style={{ width: "100%", height: "100%" }}
                     initial="hidden"
                     animate="visible"
                     variants={variants}

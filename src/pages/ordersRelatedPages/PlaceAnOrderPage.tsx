@@ -62,7 +62,7 @@ const PlaceAnOrdePage = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const order = orders.find((o) => o.business?._id === BusinessId);
-  const [clientLocation, setClientLocation] = useState<ILocation>(
+  const [clientLocation, setClientLocation] = useState<IAddress>(
     user?.address![0]!
   );
   const [addAddress, setAddAddress] = useState(false);
@@ -73,7 +73,7 @@ const PlaceAnOrdePage = () => {
 
   const placeAnOrder = async () => {
     if (!order) return;
-    const orderToSend = orderNormalized(order);
+    const orderToSend = orderNormalized(order, clientLocation);
     try {
       const res = await sendData({
         url: `/order/newOrder/${BusinessId}`,
@@ -84,8 +84,6 @@ const PlaceAnOrdePage = () => {
       navigate(`${ROUTER.ORDER}/${res.orderId}`);
       notify.success(res.message);
     } catch (e) {
-      console.log(e);
-
       if (e instanceof AxiosError) {
         notify.error(e.response?.data.message);
       } else {
@@ -128,10 +126,8 @@ const PlaceAnOrdePage = () => {
                 position: "absolute",
                 bgcolor: "divider",
                 inset: "0px 0px 33.46%  ",
-                // top: 0,
                 height: "50%",
                 width: "100%",
-                // p: 1,
                 borderRadius: 3,
                 zIndex: 1,
                 background: user?.theme
@@ -162,6 +158,7 @@ const PlaceAnOrdePage = () => {
                   <ProductOrderTamplate
                     key={product.product._id}
                     productInOrder={product}
+                    product={null}
                   />
                 ))}
               </Box>

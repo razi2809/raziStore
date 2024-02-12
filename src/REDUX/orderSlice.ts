@@ -144,8 +144,6 @@ const orderSlice = createSlice({
         // If the order doesn't exist, do nothing
         return;
       }
-      console.log(BusinessId);
-
       state.splice(orderIndex, 1);
     },
   },

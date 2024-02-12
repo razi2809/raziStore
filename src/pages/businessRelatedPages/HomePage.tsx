@@ -11,6 +11,7 @@ import AllBusinessContainer from "../../components/businessRelatedComponents/All
 import OpenBusinessContainer from "../../components/businessRelatedComponents/OpenBusinessContainer";
 import FavoriteBusinessContainer from "../../components/businessRelatedComponents/FavoriteBusinessContainer";
 import notify from "../../services/toastService";
+import HomeTemplatePage from "../templateLoadingPages/HomeTemplatePage";
 // Define the sections that can be displayed on the home page.
 
 const sectionOptions: Section[] = [
@@ -23,7 +24,7 @@ type Section = "all businesses" | "open businesses" | "favorite businesses";
 const HomePage = () => {
   const user = useAppSelector((bigpie) => bigpie.authReducer);
   const { data, error, loading } = useFetch("/business");
-  const [businesses, setBusinesses] = useState<IBusiness[]>([]);
+  const [businesses, setBusinesses] = useState<IBusiness[] | null>(null);
   const theme = useTheme();
   const location = useLocation();
   const hashValue = decodeURIComponent(location.hash.replace("#", ""));
@@ -55,7 +56,7 @@ const HomePage = () => {
   const handleTemporarlyBusinessLike = (like: boolean, businessId: string) => {
     // handle temporary likes on businesses, updating the state on the whole data.
     // Check if the user is logged in and if the business object is valid
-    if (!user.isLoggedIn || !businessId) {
+    if (!user.isLoggedIn || !businessId || !businesses) {
       return;
     }
 
@@ -78,7 +79,7 @@ const HomePage = () => {
     setBusinesses(updatedBusinesses);
   };
 
-  if (data) {
+  if (businesses) {
     return (
       <Box>
         <Box
@@ -173,10 +174,7 @@ const HomePage = () => {
         </Grid>
       </Box>
     );
-  }
-  if (loading) return <LoaderComponent />;
-  if (error) return <div>Error fetching businesses: {error.message}</div>;
-  else return null;
+  } else return <HomeTemplatePage />;
 };
 
 export default HomePage;

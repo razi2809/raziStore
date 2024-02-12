@@ -9,4 +9,5 @@ export const ROUTER = {
   ORDER: "/order",
   PRODUCT: "/product",
   CRM: `/crm`,
+  CONTACTME: "/contactMe",
 };

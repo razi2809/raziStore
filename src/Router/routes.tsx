@@ -21,6 +21,7 @@ import CRMPage from "../pages/userRelatedPages/CRMPage";
 import BusinessDetails from "../pages/businessRelatedPages/BusinessDetails";
 import UnVerifyGuard from "../Guards/UnVerifyGuard";
 import ProductDetails from "../pages/productRelatedPages/ProductDetails";
+import ContactMePage from "../pages/layoutRelatedPages/ContactMePage";
 
 const Router = () => {
   return (
@@ -157,6 +158,7 @@ const Router = () => {
           }
         />
       </Route>
+      <Route path={`${ROUTER.CONTACTME}`} element={<ContactMePage />} />
     </Routes>
   );
 };

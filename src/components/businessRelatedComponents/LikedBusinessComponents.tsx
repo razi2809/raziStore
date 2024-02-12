@@ -35,8 +35,7 @@ const LikedBusinessComponents: FC<Props> = ({ business }) => {
       <Box sx={{ position: "relative", overflow: "hidden" }}>
         <CardMedia
           sx={{
-            width: "50",
-            height: "50",
+            height: "200px",
             transition: "transform 0.5s ease",
             transform: hover ? "scale(1.05)" : "",
           }}

@@ -14,6 +14,7 @@ import { useAppSelector } from "../../REDUX/bigPie";
 import LoaderComponent from "./LoaderComponent";
 import Header from "../headerRelatedComponent/Header";
 import notify from "../../services/toastService";
+import FooterComponent from "../footerRelatedComponents/FooterComponent";
 type Props = {
   children: React.ReactNode;
 };
@@ -121,6 +122,9 @@ const LayoutComponents: FC<Props> = ({ children }) => {
             </Box>
             <Box sx={{ mt: "4em" }}>
               <MainComponent>{children}</MainComponent>
+            </Box>
+            <Box>
+              <FooterComponent />
             </Box>
           </Box>
         </ScopedCssBaseline>

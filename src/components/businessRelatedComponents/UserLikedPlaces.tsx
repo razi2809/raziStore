@@ -80,7 +80,14 @@ const UserLikedPlacesComponents: FC<Props> = ({ userLikedPlaces }) => {
               {likedPlaces &&
                 likedPlaces.length > 0 &&
                 likedPlaces.map((business) => (
-                  <Grid item md={3} sm={6} xs={12} key={business._id}>
+                  <Grid
+                    item
+                    md={3}
+                    sm={6}
+                    xs={12}
+                    key={business._id}
+                    sx={{ height: "20em" }}
+                  >
                     {" "}
                     <motion.div
                       initial={{ opacity: 0 }}

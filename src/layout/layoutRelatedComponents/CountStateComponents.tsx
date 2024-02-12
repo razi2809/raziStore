@@ -5,7 +5,7 @@ import RemoveIcon from "@mui/icons-material/Remove";
 interface Props {
   quantity: number;
   count: number;
-  setCount: React.Dispatch<React.SetStateAction<number>>;
+  setCount: React.Dispatch<React.SetStateAction<number | null>>;
 }
 const CountStateComponents: FC<Props> = ({ quantity, count, setCount }) => {
   return (

@@ -2,11 +2,12 @@ import { FC, useEffect, useRef } from "react";
 import { Loader } from "@googlemaps/js-api-loader";
 import { Box } from "@mui/material";
 import { darkMapStyle, lightMapStyle } from "../../../mapStyles";
+import { IAddress } from "../../../@types/user";
 
 const GOOGLE_API_KEY = "AIzaSyBRE84tOscrelwgGKya3Z3SrQnFPGqD6XY";
 interface Props {
   theme: "dark" | "light";
-  address: { buildingNumber: number; street: string; city: string };
+  address: IAddress;
 }
 const loader = new Loader({
   apiKey: GOOGLE_API_KEY,

@@ -46,7 +46,7 @@ const ProductTamplateDisplay: FC<Props> = ({
   );
 
   const quantity = productInOrder ? productInOrder.quantity : 1;
-  const [count, setCount] = useState(quantity);
+  const [count, setCount] = useState<number | null>(quantity);
   const productExists = productInOrder ? true : false;
   const handleProductLike = async (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>
@@ -193,7 +193,7 @@ const ProductTamplateDisplay: FC<Props> = ({
             mt: 3,
           }}
         >
-          {!productExists && user.isLoggedIn && canOrder && (
+          {!productExists && user.isLoggedIn && canOrder && count && (
             <Button
               variant="contained"
               color="primary"
@@ -210,7 +210,7 @@ const ProductTamplateDisplay: FC<Props> = ({
               <Box sx={{ flexGrow: 1 }}>Add to Cart</Box>
             </Button>
           )}
-          {productExists && user.isLoggedIn && canOrder && (
+          {productExists && user.isLoggedIn && canOrder && count && (
             <Box sx={{ display: "flex" }}>
               <Button
                 variant="contained"
@@ -254,11 +254,13 @@ const ProductTamplateDisplay: FC<Props> = ({
                 alignItems: "center",
               }}
             >
-              <CountStateComponents
-                count={count}
-                setCount={setCount}
-                quantity={product.productQuantity}
-              />
+              {count && (
+                <CountStateComponents
+                  count={count}
+                  setCount={setCount}
+                  quantity={product.productQuantity}
+                />
+              )}
             </Box>
           )}
         </Box>

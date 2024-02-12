@@ -1,9 +1,8 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { styled } from "@mui/material/styles";
 import Switch from "@mui/material/Switch";
 import { useAppDispatch, useAppSelector } from "../../REDUX/bigPie";
-import axios, { AxiosError } from "axios";
-import useAutoLogin from "../../hooks/useAutoLogin";
+import { AxiosError } from "axios";
 import sendData from "../../hooks/useSendData";
 import notify from "../../services/toastService";
 import { authActions } from "../../REDUX/authSlice";
@@ -56,7 +55,6 @@ const MaterialUISwitch = styled(Switch)(({ theme }) => ({
 }));
 
 export default function ThemeSwitcher() {
-  // const login = useAutoLogin();
   const dispatch = useAppDispatch();
   const user = useAppSelector((bigPie) => bigPie.authReducer);
   const Theme = user.user?.theme;
@@ -76,7 +74,6 @@ export default function ThemeSwitcher() {
           data: { Theme },
           method: "post",
         });
-        // login();
         dispatch(authActions.editTemperarlyTheme({ theme: Theme }));
       } catch (e) {
         //should not be an error
@@ -89,7 +86,7 @@ export default function ThemeSwitcher() {
     };
 
     sendRequest();
-  }, [darkTheme]);
+  }, [darkTheme, change, dispatch]);
   return (
     <MaterialUISwitch
       sx={{ m: 1 }}

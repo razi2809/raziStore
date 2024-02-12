@@ -176,6 +176,8 @@ const CreateBusiness = () => {
   };
   const registerBusiness = async (inputs: ICreatebusinessInputs) => {
     //set up the inputs ready to send to the server
+    const hideLoading = notify.loading("creating business...");
+
     try {
       const data = normalCreateBusiness(inputs);
       const res = await sendData({
@@ -183,9 +185,11 @@ const CreateBusiness = () => {
         data: data,
         method: "post",
       });
+      hideLoading();
       notify.success(res.message);
       navigate(`${ROUTER.HOME}}`);
     } catch (e) {
+      hideLoading();
       if (e instanceof AxiosError) {
         notify.error(e.message);
       } else {

@@ -12,7 +12,8 @@ import AddressInfo from "../../components/userRelatedComponents/AddressInfo";
 import notify from "../../services/toastService";
 import UserSettings from "../../components/userRelatedComponents/UserSettings";
 import type { changeType } from "../../@types/generic";
-import CategoryDisplayForUser from "../../components/userRelatedComponents/CategoryDisppalyForUser";
+import CategoryDisplayForUser from "../../components/userRelatedComponents/CategoryDisplayForUser";
+import ProfilePageTemplate from "../templateLoadingPages/ProfilePageTemplate";
 
 type Categories =
   | "personal-information"
@@ -62,11 +63,9 @@ const ProfilePage = () => {
 
   useEffect(() => {
     //  error handling and data setting.
-
     // Check for each specific error and and notify the user
     if (userError) {
       notify.error(userError.message);
-      console.log(userError);
 
       setUserData(null);
     } else {
@@ -174,9 +173,7 @@ const ProfilePage = () => {
         )}
       </Grid>
     );
-  }
-  if (isLoading) return <LoaderComponent />;
-  else return null;
+  } else return <ProfilePageTemplate />;
 };
 
 export default ProfilePage;

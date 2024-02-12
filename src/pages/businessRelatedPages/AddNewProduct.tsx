@@ -116,6 +116,8 @@ const AddNewProduct = () => {
   };
   const createProduct = async (inputs: IProductInputs) => {
     //set up the inputs ready to send to the server
+    const hideLoading = notify.loading("adding new product...");
+
     try {
       const data = newProductNormalized(inputs);
       const res = await sendData({
@@ -123,9 +125,11 @@ const AddNewProduct = () => {
         data: data,
         method: "post",
       });
+      hideLoading();
       notify.success(res.message);
       navigate(`${ROUTER.HOME}`);
     } catch (e) {
+      hideLoading();
       if (e instanceof AxiosError) {
         console.log(e);
 

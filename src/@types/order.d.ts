@@ -1,6 +1,6 @@
 import { IBusiness } from "./business";
 import { IProduct } from "./product";
-import { IImage } from "./user";
+import { IAddress, IImage } from "./user";
 
 interface IProductToOrder {
   product: IProduct;
@@ -16,7 +16,7 @@ interface IOrder {
   business: IBusiness | null;
   price: number;
 }
-interface IProductOrder {
+export interface IProductOrder {
   productId: string;
   productName: string;
   productImage: IImage;
@@ -31,6 +31,7 @@ interface IOrderData {
     businessName: string;
     businessImage: IImage;
   };
+  address: IAddress;
   userId: string;
   price: number;
   createdAt: Date;

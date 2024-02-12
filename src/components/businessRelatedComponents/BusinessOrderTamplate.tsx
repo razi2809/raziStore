@@ -92,6 +92,7 @@ const BusinessOrderTamplate: FC<Props> = ({ order, ordersHover, canHover }) => {
               <ProductOrderTamplate
                 key={product.product._id}
                 productInOrder={product}
+                product={null}
               />
             ))}
             <Box sx={{ display: "flex", justifyContent: "flex-end" }}>

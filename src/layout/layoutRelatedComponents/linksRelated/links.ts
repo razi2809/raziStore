@@ -1,11 +1,9 @@
+import { Children } from "react";
 import { ROUTER } from "../../../Router/ROUTER";
 
 export const links = {
   alwaysLinks: [],
-  loggedinLinks: [
-    { to: ROUTER.HOME, children: "Home page", key: 1 },
-    //   { to: `${ROUTER.CARDS}/favorite`, children: "favorite" },
-  ],
+  loggedinLinks: [{ to: ROUTER.HOME, children: "Home page", key: 1 }],
   loggedoutLinks: [
     { to: ROUTER.HOME, children: "Home page", key: 2 },
     { to: ROUTER.REGISTER, children: "Register page", key: 3 },
@@ -25,5 +23,12 @@ export const links = {
       key: 6,
     },
     { to: `${ROUTER.CRM}`, children: "crm system", key: 7 },
+  ],
+  contectMe: [
+    {
+      to: `${ROUTER.CONTACTME}`,
+      children: "contact me",
+      key: 8,
+    },
   ],
 };

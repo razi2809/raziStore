@@ -74,6 +74,14 @@ export interface ILoginInputs {
   email: string;
   password: string;
 }
+export interface IContactInputs {
+  fullName: string;
+  email: string;
+  phoneNumber: string;
+  request: string;
+  freeText: string;
+}
+
 export interface ErrorObj {
   [key: string]: string;
 }

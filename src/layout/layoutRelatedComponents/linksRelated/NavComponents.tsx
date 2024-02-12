@@ -43,6 +43,7 @@ const NavLinkComponent: FC<Props> = ({ links }) => {
         setActive("");
     }
   }, [location.pathname]);
+
   return (
     <>
       {links.map((myItem) => {
