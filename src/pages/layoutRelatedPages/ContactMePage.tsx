@@ -158,7 +158,7 @@ const ContactMePage = () => {
                       <TextField
                         fullWidth
                         name={key}
-                        autoFocus={key === "email" ? true : false}
+                        autoFocus={key === "fullName" ? true : false}
                         id={key}
                         required
                         label={key.charAt(0).toUpperCase() + key.slice(1)}

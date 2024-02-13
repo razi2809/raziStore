@@ -125,7 +125,7 @@ const OrderViewPage = () => {
                   venue: {order.business?.businessName}
                 </Typography>
                 <Typography variant="h5" sx={{ color: "text.primary" }}>
-                  price: {order.price}
+                  price: {order.price}$
                 </Typography>
               </Box>
             </Box>

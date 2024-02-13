@@ -72,7 +72,7 @@ const PersonalInfo: FC<Props> = ({ user, userLikedPlaces, orderHistory }) => {
       const res = await sendData({
         url: `users/image/${user._id}`,
         method: "patch",
-        data: { image: url },
+        data: { url },
       });
       if (user._id === myUser?._id) {
         dispatch(
@@ -87,6 +87,8 @@ const PersonalInfo: FC<Props> = ({ user, userLikedPlaces, orderHistory }) => {
       setUrl(url);
       notify.success(res.message);
     } catch (e) {
+      console.log(e);
+
       setLoading(false);
       hideLoading();
       if (e instanceof AxiosError) {

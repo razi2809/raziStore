@@ -17,7 +17,7 @@ const OrderComponents = () => {
         borderRadius: 1,
         position: "relative",
         zIndex: 1000,
-        width: "80%",
+        width: "100%",
         display: "flex",
         justifyContent: "space-around",
       }}
@@ -29,13 +29,7 @@ const OrderComponents = () => {
           <Typography variant="body1">view orders</Typography>
         )}
       </Box>
-      <Box>
-        {orders.length <= 2 ? (
-          <Typography variant="body1">view order</Typography>
-        ) : (
-          <Typography variant="body1">view orders</Typography>
-        )}
-      </Box>
+
       {hover && (
         <Box
           sx={{

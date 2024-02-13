@@ -8,7 +8,7 @@ import Menu from "@mui/material/Menu";
 import Avatar from "@mui/material/Avatar";
 import Tooltip from "@mui/material/Tooltip";
 import { authActions } from "../../REDUX/authSlice";
-import { Button } from "@mui/material";
+import { Button, Fab } from "@mui/material";
 import { useLocation, useNavigate } from "react-router-dom";
 import LinksComponent from "../layoutRelatedComponents/linksRelated/LinksComponent";
 import { useAppDispatch, useAppSelector } from "../../REDUX/bigPie";
@@ -18,7 +18,8 @@ import OrderComponents from "../../components/orderRelatedComponents/OrderCompon
 import UserCardTemplate from "../../components/userRelatedComponents/UserCardTemplate";
 import notify from "../../services/toastService";
 import { Sidebar } from "./Sidebar";
-
+import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
+import BusinessOrderTamplate from "../../components/businessRelatedComponents/BusinessOrderTamplate";
 function Header() {
   const orders = useAppSelector((bigPie) => bigPie.orderReducer);
   const dispatch = useAppDispatch();
@@ -28,6 +29,9 @@ function Header() {
   const userInfo = auth.user;
   const [openSideMenu, setOpenSideMenu] = React.useState(false);
   const [anchorElUser, setAnchorElUser] = React.useState<
+    null | (EventTarget & HTMLElement)
+  >(null);
+  const [anchorElOrder, setAnchorElOrder] = React.useState<
     null | (EventTarget & HTMLElement)
   >(null);
   const { pathname } = useLocation();
@@ -45,8 +49,17 @@ function Header() {
     }
   };
 
-  const handleCloseUserMenu = () => {
+  const handleOpenOrderMenu = (event: React.MouseEvent<HTMLElement>) => {
+    if (orders[1]?.products.length === 0) {
+      notify.warning("you need to make a purchase");
+    } else {
+      setAnchorElOrder(event.currentTarget);
+    }
+  };
+
+  const handleCloseMenu = () => {
     setAnchorElUser(null);
+    setAnchorElOrder(null);
   };
   const handeleUserNameClick = () => {
     navigate(ROUTER.HOME);
@@ -79,6 +92,56 @@ function Header() {
           >
             <Sidebar />
           </Box>
+          {orders[1]?.products.length > 0 &&
+            !pathname.includes("/order/neworder") && (
+              <Box
+                sx={{
+                  display: {
+                    xs: "flex",
+                    md: "none",
+                    sm: "none",
+                    xl: "none",
+                  },
+                  alignItems: "center",
+                }}
+              >
+                <IconButton onClick={handleOpenOrderMenu}>
+                  <ShoppingCartIcon />{" "}
+                </IconButton>
+              </Box>
+            )}
+          <Menu
+            id="menu-appbar"
+            anchorEl={anchorElOrder}
+            sx={{
+              top: 15,
+              ".MuiPaper-root": {
+                backgroundColor: "divider",
+                filter: "drop-shadow(0px 2px 8px rgba(0,0,0,0.32))",
+              },
+            }}
+            keepMounted
+            transformOrigin={{
+              vertical: "top",
+              horizontal: "left",
+            }}
+            open={Boolean(anchorElOrder)}
+            onClose={handleCloseMenu}
+          >
+            <Box onClick={handleCloseMenu}>
+              {orders.map((order) => {
+                if (!order.business) return;
+                return (
+                  <BusinessOrderTamplate
+                    key={order.business._id}
+                    order={order}
+                    ordersHover={setOpenSideMenu}
+                    canHover={false}
+                  />
+                );
+              })}
+            </Box>
+          </Menu>
           <Box
             sx={{
               display: {
@@ -102,7 +165,6 @@ function Header() {
                   component="a"
                   onClick={handeleUserNameClick}
                   sx={{
-                    mr: 2,
                     fontFamily: "monospace",
                     fontWeight: 700,
                     letterSpacing: ".3rem",
@@ -178,7 +240,7 @@ function Header() {
                   horizontal: "left",
                 }}
                 open={Boolean(anchorElUser)}
-                onClose={handleCloseUserMenu}
+                onClose={handleCloseMenu}
               >
                 <Box
                   sx={{
@@ -190,10 +252,7 @@ function Header() {
                   }}
                 >
                   {" "}
-                  <UserCardTemplate
-                    user={userInfo}
-                    close={handleCloseUserMenu}
-                  />
+                  <UserCardTemplate user={userInfo} close={handleCloseMenu} />
                   <Button
                     variant="contained"
                     onClick={handleLogOut}

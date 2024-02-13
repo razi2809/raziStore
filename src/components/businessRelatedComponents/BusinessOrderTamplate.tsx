@@ -70,7 +70,7 @@ const BusinessOrderTamplate: FC<Props> = ({ order, ordersHover, canHover }) => {
           >
             <Typography variant="h4">{order.business.businessName}</Typography>
 
-            <Typography variant="body1">{order.price}</Typography>
+            <Typography variant="body1">{order.price}$</Typography>
           </CardContent>
         </Card>
 

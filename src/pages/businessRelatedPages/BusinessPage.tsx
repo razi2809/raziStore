@@ -212,10 +212,7 @@ const BusinessPage = () => {
         </Box>
       </Grid>
     );
-  } else if (loading) {
-    <LoaderComponent />;
-  }
-  return null;
+  } else return <LoaderComponent />;
 };
 
 export default BusinessPage;

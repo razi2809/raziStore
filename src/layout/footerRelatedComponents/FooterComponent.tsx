@@ -1,5 +1,12 @@
 import { useState } from "react";
-import { AppBar, Box, Container, Grid, Typography } from "@mui/material";
+import {
+  AppBar,
+  Box,
+  Button,
+  Container,
+  Grid,
+  Typography,
+} from "@mui/material";
 
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
@@ -125,9 +132,15 @@ const FooterComponent = () => {
                   learn more
                 </Typography>
 
-                {/* <NavLinkComponent to={"/about"} key={"/about"}> */}
                 <BottomNavigation links={contectMe} closeMenu={(e) => {}} />
-                {/* </NavLinkComponent> */}
+                <Button
+                  variant="contained"
+                  href="RaziAlyassin_CV.pdf"
+                  download="RaziAlyassin_CV.pdf"
+                  sx={{ m: 1 }}
+                >
+                  download cv
+                </Button>
               </Box>
             </Grid>
           </Grid>

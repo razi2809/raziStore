@@ -132,7 +132,7 @@ const ProductTamplateComponent: FC<Props> = ({
             {product.description}
           </Typography>
           {!product.onSale && (
-            <Typography variant="body1">{product.price}</Typography>
+            <Typography variant="body1">{product.price}$</Typography>
           )}
         </Box>
         <Box

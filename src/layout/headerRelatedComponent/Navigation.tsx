@@ -1,6 +1,10 @@
 import * as React from "react";
 import { motion } from "framer-motion";
 import { MenuItem } from "./MenuItem";
+import OrderBottomComponent from "../../components/orderRelatedComponents/OrderBottomComponent";
+import { Box } from "@mui/material";
+import { useAppSelector } from "../../REDUX/bigPie";
+import { useLocation } from "react-router-dom";
 
 const variants = {
   open: {

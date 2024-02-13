@@ -29,17 +29,9 @@ const OrderBottomComponent = () => {
           <Typography variant="body1">view orders</Typography>
         )}
       </Box>
-      <Box>
-        {orders.length <= 2 ? (
-          <Typography variant="body1">view order</Typography>
-        ) : (
-          <Typography variant="body1">view orders</Typography>
-        )}
-      </Box>
       {hover && (
         <Box
           sx={{
-            // bgcolor: "secondary.main",
             p: 2,
             borderRadius: 1,
             position: "absolute",

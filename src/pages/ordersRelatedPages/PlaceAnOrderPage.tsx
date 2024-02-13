@@ -227,14 +227,22 @@ const PlaceAnOrdePage = () => {
                   venue: {order.business?.businessName}
                 </Typography>
                 <Typography variant="h5" sx={{ color: "text.primary" }}>
-                  price: {order.price}
+                  price: {order.price}$
                 </Typography>
               </Box>
               <Box sx={{ display: "flex", justifyContent: "space-around" }}>
-                <Button variant="contained" onClick={placeAnOrder}>
+                <Button
+                  variant="contained"
+                  onClick={placeAnOrder}
+                  sx={{ m: 1 }}
+                >
                   place an order
                 </Button>
-                <Button variant="contained" onClick={handleRemoveOrder}>
+                <Button
+                  sx={{ m: 1 }}
+                  variant="contained"
+                  onClick={handleRemoveOrder}
+                >
                   remove the order
                 </Button>
               </Box>
