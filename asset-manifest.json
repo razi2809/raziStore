@@ -1,13 +1,13 @@
 {
   "files": {
     "main.css": "/raziStore/static/css/main.18c617ca.css",
-    "main.js": "/raziStore/static/js/main.5094721f.js",
+    "main.js": "/raziStore/static/js/main.96769ddf.js",
     "index.html": "/raziStore/index.html",
     "main.18c617ca.css.map": "/raziStore/static/css/main.18c617ca.css.map",
-    "main.5094721f.js.map": "/raziStore/static/js/main.5094721f.js.map"
+    "main.96769ddf.js.map": "/raziStore/static/js/main.96769ddf.js.map"
   },
   "entrypoints": [
     "static/css/main.18c617ca.css",
-    "static/js/main.5094721f.js"
+    "static/js/main.96769ddf.js"
   ]
 }
